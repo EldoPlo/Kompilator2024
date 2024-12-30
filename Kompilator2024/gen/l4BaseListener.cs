@@ -280,17 +280,61 @@ public partial class l4BaseListener : Il4Listener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitProc_call([NotNull] l4Parser.Proc_callContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="l4Parser.declarations"/>.
+	/// Enter a parse tree produced by the <c>PutTable2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterDeclarations([NotNull] l4Parser.DeclarationsContext context) { }
+	public virtual void EnterPutTable2([NotNull] l4Parser.PutTable2Context context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="l4Parser.declarations"/>.
+	/// Exit a parse tree produced by the <c>PutTable2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitDeclarations([NotNull] l4Parser.DeclarationsContext context) { }
+	public virtual void ExitPutTable2([NotNull] l4Parser.PutTable2Context context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PutTable1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPutTable1([NotNull] l4Parser.PutTable1Context context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PutTable1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPutTable1([NotNull] l4Parser.PutTable1Context context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PutSymbol1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPutSymbol1([NotNull] l4Parser.PutSymbol1Context context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PutSymbol1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPutSymbol1([NotNull] l4Parser.PutSymbol1Context context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PutSymbol2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPutSymbol2([NotNull] l4Parser.PutSymbol2Context context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PutSymbol2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPutSymbol2([NotNull] l4Parser.PutSymbol2Context context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="l4Parser.args_decl"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -512,17 +556,47 @@ public partial class l4BaseListener : Il4Listener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitId([NotNull] l4Parser.IdContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="l4Parser.identifier"/>.
+	/// Enter a parse tree produced by the <c>GetPIDENTIFIER</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterIdentifier([NotNull] l4Parser.IdentifierContext context) { }
+	public virtual void EnterGetPIDENTIFIER([NotNull] l4Parser.GetPIDENTIFIERContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="l4Parser.identifier"/>.
+	/// Exit a parse tree produced by the <c>GetPIDENTIFIER</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitIdentifier([NotNull] l4Parser.IdentifierContext context) { }
+	public virtual void ExitGetPIDENTIFIER([NotNull] l4Parser.GetPIDENTIFIERContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>GetArrayByPid</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterGetArrayByPid([NotNull] l4Parser.GetArrayByPidContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>GetArrayByPid</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitGetArrayByPid([NotNull] l4Parser.GetArrayByPidContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>GetArrayByNum</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterGetArrayByNum([NotNull] l4Parser.GetArrayByNumContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>GetArrayByNum</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitGetArrayByNum([NotNull] l4Parser.GetArrayByNumContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

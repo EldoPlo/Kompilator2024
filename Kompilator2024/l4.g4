@@ -45,8 +45,8 @@ command      : identifier ':=' expression';' #Assign
              | IF condition THEN ifblock=commands ELSE elseblock=commands ENDIF #IfElse
              | WHILE condition DO commands ENDWHILE #While 
              | REPEAT commands UNTIL condition';' #Repeat
-             | FOR PIDENTIFIER FROM value TO value DO commands ENDFOR #ForUp
-             | FOR PIDENTIFIER FROM value DOWNTO value DO commands ENDFOR #ForDown
+             | FOR PIDENTIFIER FROM v1=value TO v2=value DO commands ENDFOR #ForUp
+             | FOR PIDENTIFIER FROM v1=value DOWNTO v2=value DO commands ENDFOR #ForDown
              | proc_call';' #Call
              | READ identifier';' #Read
              | WRITE value';' #Write;
@@ -55,10 +55,10 @@ proc_head    : PIDENTIFIER '(' args_decl ')';
 
 proc_call    : PIDENTIFIER '(' args ')';
 
-declarations : declarations',' PIDENTIFIER
-             | declarations',' PIDENTIFIER'['NUM':'NUM']'
-             | PIDENTIFIER
-             | PIDENTIFIER'['NUM':'NUM']';
+declarations : declarations',' PIDENTIFIER #PutSymbol1
+             | declarations',' PIDENTIFIER'['left=NUM':'right=NUM']' #PutTable1
+             | PIDENTIFIER #PutSymbol2
+             | PIDENTIFIER'['left=NUM':'right=NUM']' #PutTable2;
 
 args_decl    : args_decl',' PIDENTIFIER
              | args_decl',' T PIDENTIFIER
@@ -85,7 +85,7 @@ condition    : left=value '=' right=value #Eq
 value        : NUM #Num
              | identifier #Id;
 
-identifier   : PIDENTIFIER;
-//             | PIDENTIFIER'['PIDENTIFIER']'
-//             | PIDENTIFIER'['NUM']';
+identifier   : PIDENTIFIER #GetPIDENTIFIER
+            | PIDENTIFIER'['PIDENTIFIER']' #GetArrayByPid
+             | PIDENTIFIER'['NUM']' #GetArrayByNum;
 

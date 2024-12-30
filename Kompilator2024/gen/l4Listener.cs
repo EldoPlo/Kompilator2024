@@ -239,15 +239,53 @@ public interface Il4Listener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitProc_call([NotNull] l4Parser.Proc_callContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="l4Parser.declarations"/>.
+	/// Enter a parse tree produced by the <c>PutTable2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterDeclarations([NotNull] l4Parser.DeclarationsContext context);
+	void EnterPutTable2([NotNull] l4Parser.PutTable2Context context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="l4Parser.declarations"/>.
+	/// Exit a parse tree produced by the <c>PutTable2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitDeclarations([NotNull] l4Parser.DeclarationsContext context);
+	void ExitPutTable2([NotNull] l4Parser.PutTable2Context context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PutTable1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPutTable1([NotNull] l4Parser.PutTable1Context context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PutTable1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPutTable1([NotNull] l4Parser.PutTable1Context context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PutSymbol1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPutSymbol1([NotNull] l4Parser.PutSymbol1Context context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PutSymbol1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPutSymbol1([NotNull] l4Parser.PutSymbol1Context context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>PutSymbol2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPutSymbol2([NotNull] l4Parser.PutSymbol2Context context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>PutSymbol2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPutSymbol2([NotNull] l4Parser.PutSymbol2Context context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="l4Parser.args_decl"/>.
 	/// </summary>
@@ -437,13 +475,39 @@ public interface Il4Listener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitId([NotNull] l4Parser.IdContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="l4Parser.identifier"/>.
+	/// Enter a parse tree produced by the <c>GetPIDENTIFIER</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterIdentifier([NotNull] l4Parser.IdentifierContext context);
+	void EnterGetPIDENTIFIER([NotNull] l4Parser.GetPIDENTIFIERContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="l4Parser.identifier"/>.
+	/// Exit a parse tree produced by the <c>GetPIDENTIFIER</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitIdentifier([NotNull] l4Parser.IdentifierContext context);
+	void ExitGetPIDENTIFIER([NotNull] l4Parser.GetPIDENTIFIERContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>GetArrayByPid</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterGetArrayByPid([NotNull] l4Parser.GetArrayByPidContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>GetArrayByPid</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitGetArrayByPid([NotNull] l4Parser.GetArrayByPidContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>GetArrayByNum</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterGetArrayByNum([NotNull] l4Parser.GetArrayByNumContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>GetArrayByNum</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitGetArrayByNum([NotNull] l4Parser.GetArrayByNumContext context);
 }

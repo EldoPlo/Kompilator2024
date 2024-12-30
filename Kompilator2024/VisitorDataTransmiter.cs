@@ -4,8 +4,8 @@ namespace Kompilator2024;
 
 public class VisitorDataTransmiter
 {
-    public Variable Variable { get; private set; } = new Variable("default", 0);
-    public StringBuilder CodeBuilder { get; private set; } = new StringBuilder();
+    public Variable Variable { get;  set; } = new Variable("default", 0);
+    public StringBuilder CodeBuilder { get; set; } = new StringBuilder();
 
     public long Offset = 0;
     

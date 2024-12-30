@@ -7,13 +7,45 @@ public class Variable
     public string Name;
     public long? Value;
     public bool IsConst = false;
+    public Variable? ArrayOffsetVariable = null;
+    public Variable? ArrayAddressVariable = null;
+    public Variable? AdressVariable = null;
+    public long ArrayAddress;
+    public bool IsArray;
     public Variable(string name, long address)
     {
         Address = address; 
         IsSet = true;
         Name = name;
-        //arrayAddress = -1;
+        ArrayAddress = -1;
     }
+    
+    public Variable(long address, long arrayAddress)
+    {
+        Address= address;
+        ArrayAddress= arrayAddress;
+        IsSet = true;
+    }
+
+    public Variable(long address, Variable addressVar, Variable arrayOffset, Variable adressVariable)
+    {
+        Address = address;
+        ArrayAddressVariable = addressVar;
+        ArrayOffsetVariable = arrayOffset;
+        AdressVariable = adressVariable;
+        IsSet = true;
+        IsArray = true;
+    }
+    
+    // public Variable(long address, long arrayAddress, long arrOffset)
+    // {
+    //     Address = address;
+    //     ArrayAddress = arrayAddress;
+    //     ArrayOffset = arrOffset;
+    //     IsSet = true;
+    //     IsArray = true;
+    // }
+
     
     public Variable(long address)
     {

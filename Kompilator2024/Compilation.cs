@@ -4,6 +4,19 @@ using Antlr4.Runtime;
 
 namespace Kompilator2024
 {
+    public class MyErrorListener : BaseErrorListener
+    {
+        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine,
+            string msg, RecognitionException e)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            // Print the error message
+            Console.WriteLine($"Syntax error at line {line}:{charPositionInLine} - {msg}");
+
+            // Reset the text color
+            Console.ResetColor();        }
+    }
     public class Compilation
     {
         public void Calculate(string input, string output)
@@ -13,7 +26,13 @@ namespace Kompilator2024
             var memory = new MemoryHandler();
             var codegen = new CodeGenerator();
             var parser = new l4Parser(tokens);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new MyErrorListener());
             var tree = parser.program_all();
+            if (parser.NumberOfSyntaxErrors != 0)
+            {
+                throw new Exception("PROBLEM W KOMPILACJI");
+            }
 
             var visitor = new LanguageVisitor(memory, codegen);
             var result = visitor.Visit(tree);

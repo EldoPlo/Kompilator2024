@@ -154,11 +154,33 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitProc_call([NotNull] l4Parser.Proc_callContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="l4Parser.declarations"/>.
+	/// Visit a parse tree produced by the <c>PutTable2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitDeclarations([NotNull] l4Parser.DeclarationsContext context);
+	Result VisitPutTable2([NotNull] l4Parser.PutTable2Context context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>PutTable1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPutTable1([NotNull] l4Parser.PutTable1Context context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>PutSymbol1</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPutSymbol1([NotNull] l4Parser.PutSymbol1Context context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>PutSymbol2</c>
+	/// labeled alternative in <see cref="l4Parser.declarations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitPutSymbol2([NotNull] l4Parser.PutSymbol2Context context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="l4Parser.args_decl"/>.
 	/// </summary>
@@ -270,9 +292,24 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitId([NotNull] l4Parser.IdContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="l4Parser.identifier"/>.
+	/// Visit a parse tree produced by the <c>GetPIDENTIFIER</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdentifier([NotNull] l4Parser.IdentifierContext context);
+	Result VisitGetPIDENTIFIER([NotNull] l4Parser.GetPIDENTIFIERContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>GetArrayByPid</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGetArrayByPid([NotNull] l4Parser.GetArrayByPidContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>GetArrayByNum</c>
+	/// labeled alternative in <see cref="l4Parser.identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGetArrayByNum([NotNull] l4Parser.GetArrayByNumContext context);
 }
