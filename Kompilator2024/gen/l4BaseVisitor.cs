@@ -293,17 +293,6 @@ public partial class l4BaseVisitor<Result> : AbstractParseTreeVisitor<Result>, I
 	/// <return>The visitor result.</return>
 	public virtual Result VisitArgs([NotNull] l4Parser.ArgsContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Eval</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// <para>
-	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
-	/// on <paramref name="context"/>.
-	/// </para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	public virtual Result VisitEval([NotNull] l4Parser.EvalContext context) { return VisitChildren(context); }
-	/// <summary>
 	/// Visit a parse tree produced by the <c>Add</c>
 	/// labeled alternative in <see cref="l4Parser.expression"/>.
 	/// <para>
@@ -358,6 +347,17 @@ public partial class l4BaseVisitor<Result> : AbstractParseTreeVisitor<Result>, I
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitMod([NotNull] l4Parser.ModContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Eval</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitEval([NotNull] l4Parser.EvalContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Eq</c>
 	/// labeled alternative in <see cref="l4Parser.condition"/>.

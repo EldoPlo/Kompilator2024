@@ -12,6 +12,10 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     private readonly MemoryHandler _memoryHandler;
     private readonly CodeGenerator _codeGenerator;
     private string lastPID = string.Empty;
+    private List<string> currentparrams = new List<string>();
+    private List<string> currentdeclarations = new List<string>();
+    private List<Variable> currentargs = new List<Variable>();
+    
     
 
     public LanguageVisitor(MemoryHandler memoryHandler, CodeGenerator codeGenerator)
@@ -26,7 +30,10 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
         
         var proc_ret = Visit(ctx.procedures());
         dataTransmiter.CodeBuilder.Append(proc_ret.CodeBuilder);
-            
+        _memoryHandler.DeclareFunction("main");
+        _codeGenerator.InitConstants(dataTransmiter.CodeBuilder);
+      
+        _memoryHandler.SetContext("main");
         var main_ret = Visit(ctx.main());
         dataTransmiter.CodeBuilder.Append(main_ret.CodeBuilder);
         
@@ -37,19 +44,116 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     public override VisitorDataTransmiter VisitNoPreocedures(l4Parser.NoPreoceduresContext ctx)
     {
         var dataTransmiter = new VisitorDataTransmiter();
+        _memoryHandler.DeclareFunction("main");
         _codeGenerator.InitConstants(dataTransmiter.CodeBuilder);
-        _memoryHandler.InitConstantVariables();
+        
+        _memoryHandler.SetContext("main");
         var main_ret = Visit(ctx.main());
         dataTransmiter.CodeBuilder.Append(main_ret.CodeBuilder);
         
         _codeGenerator.End(dataTransmiter.CodeBuilder);
-        return dataTransmiter;    }
+        return dataTransmiter;    
+    }
+
+    public override VisitorDataTransmiter VisitProc_head(l4Parser.Proc_headContext ctx)
+    {
+        _memoryHandler.DeclareFunction(ctx.PIDENTIFIER().GetText());
+        Visit(ctx.args_decl());
+        Procedure procedure = new Procedure(ctx.PIDENTIFIER().GetText(), new List<string>(currentparrams));
+        _memoryHandler.AddFunction(procedure);
+        currentparrams.Clear();
+        return new VisitorDataTransmiter(procedure);
+    }
+
+    public override VisitorDataTransmiter VisitArgs_decl(l4Parser.Args_declContext ctx)
+    {
+        if (ctx.args_decl() is not null)
+        {
+            Visit(ctx.args_decl());
+        }
+        
+        currentparrams.Add((ctx.T() is null ? "" : "T ") + ctx.PIDENTIFIER().GetText());
+        return new VisitorDataTransmiter();
+    }
+
+    public override VisitorDataTransmiter VisitProcedures(
+        l4Parser.ProceduresContext ctx)
+    {
+        if (ctx.procedures() is not null)
+        {
+            Visit(ctx.procedures());
+        }
+        var dataTransmiter = new VisitorDataTransmiter();
+        
+        var currentContext = _memoryHandler.GetCurrentContext();
+        var procedure = Visit(ctx.proc_head()).Procedure;
+        _memoryHandler.SetContext(procedure.Name);
+        if(ctx.declarations() is not null)
+        { 
+            var declaretions = Visit(ctx.declarations());
+            procedure.DeclarationsContext = ctx.declarations();
+            procedure.Declaretions = new List<string>(currentdeclarations);
+            //TODO Sprawdzic, czy nie sa zadeklarowane te same nazwy co argumenty
+            currentdeclarations.Clear();
+        }
+       
+        procedure.CommandsContext = ctx.commands();
+        _memoryHandler.SetContext(currentContext);
+        return new VisitorDataTransmiter();
+    }
+
+    public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext ctx)
+    {
+        var datatransmiter = new VisitorDataTransmiter();
+        Visit(ctx.args());
+        var function = _memoryHandler.GetFunction(ctx.PIDENTIFIER().GetText());
+        if (currentargs.Count != function.Parameters.Count)
+        {
+            throw new Exception($"Invalid number of parameters");
+        }
+
+        var currentcontext = _memoryHandler.GetCurrentContext();
+        _memoryHandler.SetContext(function.Name);
+        _memoryHandler.ResetContext(function.Name);
+        for (int i = 0; i < currentargs.Count; i++)
+        {
+            _memoryHandler.GetSymbol(function.Parameters[i]);
+            _memoryHandler.SetSymbolOffset(function.Parameters[i], currentargs[i]);
+        }
+        currentargs.Clear();
+        if (function.DeclarationsContext is not null)
+        {
+            datatransmiter.CodeBuilder.Append( Visit(function.DeclarationsContext).CodeBuilder);
+        }
+        datatransmiter.CodeBuilder.Append(Visit(function.CommandsContext).CodeBuilder);
+        _memoryHandler.ResetContext(function.Name);
+        _memoryHandler.SetContext(currentcontext);
+
+        return datatransmiter;
+    }
+
+    public override VisitorDataTransmiter VisitCall(l4Parser.CallContext ctx)
+    {
+        return Visit(ctx.proc_call());
+    }
+
+    public override VisitorDataTransmiter VisitArgs(l4Parser.ArgsContext ctx)
+    {
+        if (ctx.args() is not null)
+        {
+            Visit(ctx.args());
+        }
+
+        var variable = _memoryHandler.GetVariable(ctx.PIDENTIFIER().GetText());
+        currentargs.Add(variable);
+        return new VisitorDataTransmiter();
+    }
 
     public override VisitorDataTransmiter VisitDeclare(l4Parser.DeclareContext ctx)
     {
         var decRet = Visit(ctx.declarations());
         var com_ret = Visit(ctx.commands());
-
+        currentdeclarations.Clear();
         VisitorDataTransmiter ret = new VisitorDataTransmiter();
 
         ret.CodeBuilder.Append(decRet.CodeBuilder);
@@ -94,7 +198,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
         Visit(ctx.declarations());
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         _memoryHandler.GetSymbol(ctx.PIDENTIFIER().GetText());
-        
+        currentdeclarations.Add(ctx.PIDENTIFIER().GetText());
 
         return new VisitorDataTransmiter();
 
@@ -104,7 +208,8 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     {
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         _memoryHandler.GetSymbol(ctx.PIDENTIFIER().GetText());
-       
+        currentdeclarations.Add(ctx.PIDENTIFIER().GetText());
+
 
         return new VisitorDataTransmiter();
     }
@@ -114,12 +219,15 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
         var ret = Visit(ctx.declarations());
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         var retLeft = GenerateNum(long.Parse(ctx.left.Text));
+        var retRight = GenerateNum(long.Parse(ctx.right.Text));
         ret.CodeBuilder.Append(retLeft.CodeBuilder);
+        ret.CodeBuilder.Append(retRight.CodeBuilder);
         
         var tableAdd = _memoryHandler.AddTable(ctx.PIDENTIFIER().GetText(), long.Parse(ctx.left.Text), long.Parse(ctx.right.Text));
        
         var retAddress = GenerateNum(tableAdd);
         ret.CodeBuilder.Append(retAddress.CodeBuilder);
+        currentdeclarations.Add(ctx.PIDENTIFIER().GetText());
 
         return ret;
     }
@@ -128,12 +236,14 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     {
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         var retLeft = GenerateNum(long.Parse(ctx.left.Text));
-
+        var retRight = GenerateNum(long.Parse(ctx.right.Text));
+        retLeft.CodeBuilder.Append(retRight.CodeBuilder);
         var tableAdd = _memoryHandler.AddTable(ctx.PIDENTIFIER().GetText(), long.Parse(ctx.left.Text), long.Parse(ctx.right.Text));
 
         var retAddress = GenerateNum(tableAdd);
         retLeft.CodeBuilder.Append(retAddress.CodeBuilder);
-        
+        currentdeclarations.Add(ctx.PIDENTIFIER().GetText());
+
         return retLeft;
     }
 
@@ -222,7 +332,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
 
         
 
-        // Wywołaj metodę Multiply w celu wygenerowania kodu mnożenia
+        
         _codeGenerator.Mul(variable1, variable2, dataTransmitter.CodeBuilder);
 
 
@@ -576,6 +686,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     {
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         lastPID = ctx.PIDENTIFIER().GetText();
+       
         return new VisitorDataTransmiter(_memoryHandler.GetVariable(ctx.PIDENTIFIER().GetText()));
     }
 

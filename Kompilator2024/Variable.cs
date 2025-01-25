@@ -12,6 +12,7 @@ public class Variable
     public Variable? AdressVariable = null;
     public long ArrayAddress;
     public bool IsArray;
+    public bool IsParameter = false;
     public Variable(string name, long address)
     {
         Address = address; 
@@ -61,6 +62,16 @@ public class Variable
         Value = value;
         IsConst = true;
     }
+    
+    public Variable(string name, long address, bool isParameter)
+    {
+        Name = name;
+        Address = address;
+        IsSet = true;
+        IsParameter = isParameter;
+        
+    }
+
 
     public long? GetValue()
     {

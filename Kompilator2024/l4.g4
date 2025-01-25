@@ -29,10 +29,10 @@ T: 'T';
 program_all  : procedures main #WithProcedures
              | main #NoPreocedures;
 
-procedures   : procedures PROCEDURE proc_head IS declarations BEGIN commands END
-             | procedures PROCEDURE proc_head IS BEGIN commands END
-             | PROCEDURE proc_head IS declarations BEGIN commands END
-             | PROCEDURE proc_head IS BEGIN commands END;
+procedures   : procedures PROCEDURE proc_head IS declarations BEGIN commands END 
+             | procedures PROCEDURE proc_head IS BEGIN commands END 
+             | PROCEDURE proc_head IS declarations BEGIN commands END 
+             | PROCEDURE proc_head IS BEGIN commands END; 
 
 main         : PROGRAM IS declarations BEGIN commands END #Declare
              | PROGRAM IS BEGIN commands END #NoDeclare;
@@ -68,12 +68,12 @@ args_decl    : args_decl',' PIDENTIFIER
 args         : args',' PIDENTIFIER
              | PIDENTIFIER;
 
-expression   : value #Eval
-             | left=value '+' right=value #Add
+expression   : left=value '+' right=value #Add
              | left=value '-' right=value #Sub
              | left=value '*' right=value #Mul
              | left=value '/' right=value #Div
-             | left=value '%' right=value #Mod;
+             | left=value '%' right=value #Mod
+             | value #Eval;
 
 condition    : left=value '=' right=value #Eq
              | left=value '!=' right=value #Neq

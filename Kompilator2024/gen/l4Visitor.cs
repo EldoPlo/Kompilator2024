@@ -194,13 +194,6 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArgs([NotNull] l4Parser.ArgsContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Eval</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitEval([NotNull] l4Parser.EvalContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>Add</c>
 	/// labeled alternative in <see cref="l4Parser.expression"/>.
 	/// </summary>
@@ -235,6 +228,13 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitMod([NotNull] l4Parser.ModContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Eval</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEval([NotNull] l4Parser.EvalContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Eq</c>
 	/// labeled alternative in <see cref="l4Parser.condition"/>.

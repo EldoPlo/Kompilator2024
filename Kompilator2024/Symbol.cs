@@ -5,12 +5,13 @@ public class Symbol
     public string Name;
     public long Offset;
     public long Value;
-
+    public List<string> Parameters;
+    
     
      private bool isInitialized;
-     private  bool isArray;
-     private  bool isIterator;
-
+     public  bool isArray;
+     public  bool isIterator;
+     private bool isProcedure;
     
      private  long Size;
      public  long ArrayBeginIdx { get; set; }
@@ -38,10 +39,12 @@ public class Symbol
         isInitialized = true;
         isArray = true;
         isIterator = false;
-    
+        isProcedure = false;
+        
         Size = arrayEndIdx - arrayBeginIdx + 1;
         ArrayBeginIdx = arrayBeginIdx;
         ArrayEndIdx = arrayEndIdx;
+       
     }
 
     public Symbol(String name, long offset, bool iterator, bool init)
@@ -52,10 +55,22 @@ public class Symbol
         isInitialized = true;
         isArray = false;
         isIterator = true;
+        isProcedure = false;
+        
         Size = 1;
         ArrayBeginIdx = 0;
         ArrayEndIdx = 0;
     }
+    
+    // Konstruktor dla procedur
+    public Symbol(string name, long offset, List<string> parameters)
+    {
+        Name = name;
+        Offset = offset;
+        Parameters = parameters;
+        isProcedure = true;
+    }
+
     
     public bool isArrayy()
     {

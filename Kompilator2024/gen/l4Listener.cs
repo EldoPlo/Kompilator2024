@@ -307,18 +307,6 @@ public interface Il4Listener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitArgs([NotNull] l4Parser.ArgsContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Eval</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterEval([NotNull] l4Parser.EvalContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>Eval</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitEval([NotNull] l4Parser.EvalContext context);
-	/// <summary>
 	/// Enter a parse tree produced by the <c>Add</c>
 	/// labeled alternative in <see cref="l4Parser.expression"/>.
 	/// </summary>
@@ -378,6 +366,18 @@ public interface Il4Listener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitMod([NotNull] l4Parser.ModContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Eval</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterEval([NotNull] l4Parser.EvalContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Eval</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitEval([NotNull] l4Parser.EvalContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Eq</c>
 	/// labeled alternative in <see cref="l4Parser.condition"/>.

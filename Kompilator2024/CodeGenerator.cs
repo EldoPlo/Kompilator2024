@@ -22,9 +22,10 @@ public class CodeGenerator
 
     public long CopyValue(Variable src, Variable dst, StringBuilder sb)
     {
-        sb.AppendLine($"LOAD {src.Address}");
-        sb.AppendLine($"STORE {dst.Address}");
-        return 2;
+        var offset = 0L;
+        offset += GetVarVal(src, 3, sb);
+        offset += SaveVarVal(dst, 3, sb);
+        return offset;
     }
 
     public long LoadValue(Variable var, StringBuilder sb)
@@ -63,16 +64,18 @@ public class CodeGenerator
         return 3;
     }
 
+  
     public long GetArrVarToMem(Variable var, long memoryIndex, StringBuilder sb)
     {
         
         // sb.AppendLine($"ADD {var.ArrayOffset}");
-        LoadArrAddress(var, sb);
+        var offset = 0L;
+        offset += LoadArrAddress(var, sb);
         sb.AppendLine($"LOADI 0");
         sb.AppendLine($"STORE {memoryIndex}");
         
 
-        return 5;
+        return offset + 2;
     }
     //1 2 3 4 5 6 7 8 9 10
     //[][][][][][][][][][]
@@ -94,13 +97,14 @@ public class CodeGenerator
 
     public long SaveArrToVarMem(long memoryIndex, Variable destArrVar, StringBuilder sb)
     {
+        
         sb.AppendLine($"LOAD {memoryIndex}");
         sb.AppendLine("STORE 2");
-        LoadArrAddress(destArrVar, sb);
+        var offset = LoadArrAddress(destArrVar, sb);
         sb.AppendLine($"STORE 1");
         sb.AppendLine($"LOAD 2");
         sb.AppendLine($"STOREI 1");
-        return 8;
+        return 5 + offset;
     }
     
     public long SaveToVarMem(long memoryIndex, Variable destVar, StringBuilder sb)
@@ -127,21 +131,21 @@ public class CodeGenerator
 
     public long Write(Variable var, StringBuilder sb)
     {
-        var offset = 0;
-        GetVarVal(var, 0, sb);
+        var offset = 0L;
+        offset += GetVarVal(var, 0, sb);
         sb.AppendLine($"PUT 0");
         Console.WriteLine($"Po WRITE, CodeBuilder: {sb.ToString()}");
-        return 1;
+        return 1 + offset;
     }
 
    
     public long Assign(Variable destVar, Variable srcVar, StringBuilder sb)
     {
 
-        long offset = 0;
-        GetVarVal(srcVar, 0, sb);
-        SaveVarVal(destVar, 0, sb);
-        return 1;
+        long offset = 0L;
+        offset += GetVarVal(srcVar, 0, sb);
+        offset += SaveVarVal(destVar, 0, sb);
+        return offset;
     }
 
    
@@ -179,9 +183,9 @@ public class CodeGenerator
     {
         // Mem
         // [0, 0, 0, 0, 0, 0] 
-        long offset = 0;
-        offset+= GetVarVal(var1, 3, sb);
-        offset+= GetVarVal(var2, 4, sb);
+        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+        GetVarVal(var1, 3, sb);
+        GetVarVal(var2, 4, sb);
         // Inicjalizacja liczb
         sb.AppendLine($"LOAD 3"); // Załaduj var1
         sb.AppendLine("STORE 1"); // Przechowaj var1 w pamięci[1]
@@ -273,9 +277,10 @@ public class CodeGenerator
         sb.AppendLine("STORE 3");
         // Wynik w p0
         sb.AppendLine("LOAD 3");
-        return 1;
+        long offset_end = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
 
-
+        
+        return offset_end - offset_start;
     }
 
     public long Div(Variable var1, Variable var2, StringBuilder sb)
@@ -286,9 +291,9 @@ public class CodeGenerator
         // Load first operand to memory
         //Imicjalizacja 0 i 1 w odpowienio Memory[10] i Memory [11]
         ;
-        long offset = 0;
-        offset+= GetVarVal(var1, 3, sb);
-        offset+= GetVarVal(var2, 4, sb);
+        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+        GetVarVal(var1, 3, sb);
+        GetVarVal(var2, 4, sb);
 
         sb.AppendLine("LOAD 3"); // Załaduj var1
         sb.AppendLine("STORE 1"); // Przechowaj var1 w pamięci[1]
@@ -418,13 +423,16 @@ public class CodeGenerator
         sb.AppendLine("STORE 3");
         // Wynik w p0
         sb.AppendLine("LOAD 3");
-        return 1;
+        long offset_end = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+
+        return offset_end - offset_start;
 
     }
 
     public long Mod(Variable var1, Variable var2, StringBuilder sb)
     {
-       
+        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+        
         Div(var1, var2, sb); 
         // QUOTIENT IN MEM[0]
 
@@ -452,7 +460,9 @@ public class CodeGenerator
         sb.AppendLine($"LOAD 5");
         sb.AppendLine("SUB 1");
 
-        return 1;
+        long offset_end = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+
+        return offset_end - offset_start;
     }
 
     public long Eq(Variable var1, Variable var2, StringBuilder sb)
@@ -465,7 +475,7 @@ public class CodeGenerator
 
         sb.AppendLine("SUB 4");
         sb.AppendLine("JZERO 2");
-        offset += 5;
+        offset += 3;
         return offset;
     }
 
@@ -482,7 +492,7 @@ public class CodeGenerator
         //JESLI JEST MNIEJSZE LUB WIĘKSZE (CYLI RÓŻNE) TO WSKAKUJEMY
         sb.AppendLine("JPOS 3");
         sb.AppendLine("JNEG 2");
-        offset += 6;
+        offset += 4;
         return offset;
     }
     
@@ -496,7 +506,7 @@ public class CodeGenerator
 
         sb.AppendLine("SUB 3");
         sb.AppendLine("JNEG 2");
-        offset += 5;
+        offset += 3;
         
         return offset;
     }
@@ -513,7 +523,7 @@ public class CodeGenerator
 
         sb.AppendLine("SUB 3");
         sb.AppendLine("JPOS 2");
-        offset += 5;
+        offset += 3;
         return offset;
     }
     
@@ -528,7 +538,7 @@ public class CodeGenerator
         sb.AppendLine("SUB 3");
         sb.AppendLine("JPOS 3");
         sb.AppendLine("JZERO 2");
-        offset += 6;
+        offset += 4;
         return offset;
     }
     
@@ -543,7 +553,7 @@ public class CodeGenerator
         sb.AppendLine("SUB 3");;
         sb.AppendLine("JNEG 3");
         sb.AppendLine("JZERO 2");
-        offset += 6;
+        offset += 4;
         return offset;
     }
     
@@ -553,68 +563,77 @@ public class CodeGenerator
         return 1;
     }
     
-    public void If_else_block_first(long offset, StringBuilder sb)
+    public long If_else_block_first(long offset, StringBuilder sb)
     {
         sb.AppendLine("JUMP" + " " + (offset+2));
-        
+        return 1;
     }
     
-    public void If_else_block_sec(long offset, StringBuilder sb)
+    public long If_else_block_sec(long offset, StringBuilder sb)
     {
         sb.AppendLine("JUMP" + " " + (offset+1));
-        
+        return 1;
     }
 
-    public void While_first_block(long offset, StringBuilder sb)
+    public long While_first_block(long offset, StringBuilder sb)
     {
         sb.AppendLine($"JUMP {offset + 2}");
+        return 1;
     }
 
-    public void While_sec_block(long commandoffset,long condoffset,StringBuilder sb)
+    public long While_sec_block(long commandoffset,long condoffset,StringBuilder sb)
     {
         sb.AppendLine($"JUMP -{commandoffset + condoffset + 1}");
+        return 1;
     }
 
 
-    public void Repeat_block(long commandoffset, long condoffset, StringBuilder sb)
+    public long Repeat_block(long commandoffset, long condoffset, StringBuilder sb)
     {
         sb.AppendLine($"JUMP -{commandoffset + condoffset}");
+        return 1;
     }
 
-    public void For_block_init(ForLabel label, Variable start, Variable end, StringBuilder sb)
+    public long For_block_init(ForLabel label, Variable start, Variable end, StringBuilder sb)
     {
-        CopyValue(start, label.Iterator, sb);
-        CopyValue(end, label.End, sb);
+        var offset = 0L;
+        offset += CopyValue(start, label.Iterator, sb);
+        offset += CopyValue(end, label.End, sb);
+
+        return offset;
     }
     
-    public void For_to_block_first(ForLabel label, StringBuilder sb)
+    public long For_to_block_first(ForLabel label, StringBuilder sb)
     {
-        Leq(label.Iterator, label.End, sb);
+        return Leq(label.Iterator, label.End, sb);
     }
 
-    public void For_downto_block_first(ForLabel label, StringBuilder sb)
+    public long For_downto_block_first(ForLabel label, StringBuilder sb)
     {
-        Geq(label.Iterator, label.End, sb);
+        return Geq(label.Iterator, label.End, sb);
     }
     
-    public void For_to_block_second(ForLabel label, long offsetCond, StringBuilder sb)
+    public long For_to_block_second(ForLabel label, long offsetCond, StringBuilder sb)
     {
         sb.AppendLine($"LOAD {label.Iterator.Address}");
         sb.AppendLine($"ADD 11");
         sb.AppendLine($"STORE {label.Iterator.Address}");
         sb.AppendLine($"JUMP -{offsetCond + GetLineCount(sb) + 1}");
+        return 4;
     }
     
-    public void For_downto_block_second(ForLabel label, long offsetCond, StringBuilder sb)
+    public long For_downto_block_second(ForLabel label, long offsetCond, StringBuilder sb)
     {
         sb.AppendLine($"LOAD {label.Iterator.Address}");
         sb.AppendLine($"SUB 11");
         sb.AppendLine($"STORE {label.Iterator.Address}");
         sb.AppendLine($"JUMP -{offsetCond + GetLineCount(sb) + 1}");
+        return 4;
     }
-    public void For_block_addJump(long offsetCommands, StringBuilder sb)
+    public long For_block_addJump(long offsetCommands, StringBuilder sb)
     {
         sb.AppendLine("JUMP " + (offsetCommands+1));
+        return 1;
     }
     
     long GetConstant(Variable var, StringBuilder sb)
@@ -624,18 +643,17 @@ public class CodeGenerator
     
     public long GetLineCount(StringBuilder sb)
     {
-        
         if (sb == null || sb.Length == 0)
             return 0;
-
         
         return sb.ToString().Count(c => c == '\n');
     }
     
 
-    public void End(StringBuilder sb)
+    public long End(StringBuilder sb)
     {
         sb.AppendLine("HALT");
+        return 1;
     }
     
 }

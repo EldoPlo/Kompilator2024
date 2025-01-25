@@ -1789,71 +1789,71 @@ public partial class l4Parser : Parser {
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,14,Context) ) {
 			case 1:
-				_localctx = new EvalContext(_localctx);
+				_localctx = new AddContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
 				State = 228;
-				value();
-				}
-				break;
-			case 2:
-				_localctx = new AddContext(_localctx);
-				EnterOuterAlt(_localctx, 2);
-				{
-				State = 229;
 				((AddContext)_localctx).left = value();
-				State = 230;
+				State = 229;
 				Match(T__8);
-				State = 231;
+				State = 230;
 				((AddContext)_localctx).right = value();
 				}
 				break;
-			case 3:
+			case 2:
 				_localctx = new SubContext(_localctx);
-				EnterOuterAlt(_localctx, 3);
+				EnterOuterAlt(_localctx, 2);
 				{
-				State = 233;
+				State = 232;
 				((SubContext)_localctx).left = value();
-				State = 234;
+				State = 233;
 				Match(T__9);
-				State = 235;
+				State = 234;
 				((SubContext)_localctx).right = value();
 				}
 				break;
-			case 4:
+			case 3:
 				_localctx = new MulContext(_localctx);
-				EnterOuterAlt(_localctx, 4);
+				EnterOuterAlt(_localctx, 3);
 				{
-				State = 237;
+				State = 236;
 				((MulContext)_localctx).left = value();
-				State = 238;
+				State = 237;
 				Match(T__10);
-				State = 239;
+				State = 238;
 				((MulContext)_localctx).right = value();
 				}
 				break;
-			case 5:
+			case 4:
 				_localctx = new DivContext(_localctx);
-				EnterOuterAlt(_localctx, 5);
+				EnterOuterAlt(_localctx, 4);
 				{
-				State = 241;
+				State = 240;
 				((DivContext)_localctx).left = value();
-				State = 242;
+				State = 241;
 				Match(T__11);
-				State = 243;
+				State = 242;
 				((DivContext)_localctx).right = value();
 				}
 				break;
-			case 6:
+			case 5:
 				_localctx = new ModContext(_localctx);
+				EnterOuterAlt(_localctx, 5);
+				{
+				State = 244;
+				((ModContext)_localctx).left = value();
+				State = 245;
+				Match(T__12);
+				State = 246;
+				((ModContext)_localctx).right = value();
+				}
+				break;
+			case 6:
+				_localctx = new EvalContext(_localctx);
 				EnterOuterAlt(_localctx, 6);
 				{
-				State = 245;
-				((ModContext)_localctx).left = value();
-				State = 246;
-				Match(T__12);
-				State = 247;
-				((ModContext)_localctx).right = value();
+				State = 248;
+				value();
 				}
 				break;
 			}
@@ -2482,13 +2482,13 @@ public partial class l4Parser : Parser {
 		0,215,17,1,0,0,0,216,214,1,0,0,0,217,218,6,9,-1,0,218,219,5,22,0,0,219,
 		225,1,0,0,0,220,221,10,2,0,0,221,222,5,5,0,0,222,224,5,22,0,0,223,220,
 		1,0,0,0,224,227,1,0,0,0,225,223,1,0,0,0,225,226,1,0,0,0,226,19,1,0,0,0,
-		227,225,1,0,0,0,228,250,3,24,12,0,229,230,3,24,12,0,230,231,5,9,0,0,231,
-		232,3,24,12,0,232,250,1,0,0,0,233,234,3,24,12,0,234,235,5,10,0,0,235,236,
-		3,24,12,0,236,250,1,0,0,0,237,238,3,24,12,0,238,239,5,11,0,0,239,240,3,
-		24,12,0,240,250,1,0,0,0,241,242,3,24,12,0,242,243,5,12,0,0,243,244,3,24,
-		12,0,244,250,1,0,0,0,245,246,3,24,12,0,246,247,5,13,0,0,247,248,3,24,12,
-		0,248,250,1,0,0,0,249,228,1,0,0,0,249,229,1,0,0,0,249,233,1,0,0,0,249,
-		237,1,0,0,0,249,241,1,0,0,0,249,245,1,0,0,0,250,21,1,0,0,0,251,252,3,24,
+		227,225,1,0,0,0,228,229,3,24,12,0,229,230,5,9,0,0,230,231,3,24,12,0,231,
+		250,1,0,0,0,232,233,3,24,12,0,233,234,5,10,0,0,234,235,3,24,12,0,235,250,
+		1,0,0,0,236,237,3,24,12,0,237,238,5,11,0,0,238,239,3,24,12,0,239,250,1,
+		0,0,0,240,241,3,24,12,0,241,242,5,12,0,0,242,243,3,24,12,0,243,250,1,0,
+		0,0,244,245,3,24,12,0,245,246,5,13,0,0,246,247,3,24,12,0,247,250,1,0,0,
+		0,248,250,3,24,12,0,249,228,1,0,0,0,249,232,1,0,0,0,249,236,1,0,0,0,249,
+		240,1,0,0,0,249,244,1,0,0,0,249,248,1,0,0,0,250,21,1,0,0,0,251,252,3,24,
 		12,0,252,253,5,14,0,0,253,254,3,24,12,0,254,276,1,0,0,0,255,256,3,24,12,
 		0,256,257,5,15,0,0,257,258,3,24,12,0,258,276,1,0,0,0,259,260,3,24,12,0,
 		260,261,5,16,0,0,261,262,3,24,12,0,262,276,1,0,0,0,263,264,3,24,12,0,264,
