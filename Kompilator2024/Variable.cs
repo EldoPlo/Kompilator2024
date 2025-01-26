@@ -28,7 +28,7 @@ public class Variable
         IsSet = true;
     }
 
-    public Variable(long address, Variable addressVar, Variable arrayOffset, Variable adressVariable)
+    public Variable(long address, Variable addressVar, Variable arrayOffset, Variable adressVariable, string name = "")
     {
         Address = address;
         ArrayAddressVariable = addressVar;
@@ -36,6 +36,7 @@ public class Variable
         AdressVariable = adressVariable;
         IsSet = true;
         IsArray = true;
+        Name = name;
     }
     
     // public Variable(long address, long arrayAddress, long arrOffset)
@@ -47,6 +48,12 @@ public class Variable
     //     IsArray = true;
     // }
 
+    public Variable( long offset, long arrayBeginIdx, long arrayEndIdx, String name= "")
+    {
+        Address = offset;
+        ArrayOffsetVariable = new Variable(arrayBeginIdx);
+        
+    }
     
     public Variable(long address)
     {
@@ -75,8 +82,30 @@ public class Variable
 
     public long? GetValue()
     {
+        if (!IsSet)
+        {
+            Console.WriteLine($"Error: Variable '{Name}' is not set.");
+            return null; 
+        }
+
+        
+        if (IsConst)
+        {
+            return Value;
+        }
+
+        
+        if (IsArray && ArrayOffsetVariable != null)
+        {
+            
+            long arrayOffset = ArrayOffsetVariable.GetValue() ?? 0;
+            return ArrayAddress + arrayOffset; 
+        }
+
+        
         return Value;
     }
+    
     
     
 }

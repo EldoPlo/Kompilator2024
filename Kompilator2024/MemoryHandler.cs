@@ -6,7 +6,7 @@ namespace Kompilator2024
         private Dictionary<string, Procedure> Procedures = new Dictionary<string, Procedure>();
         private HashSet<string> CalledProcedures = new HashSet<string>();
         private Stack<Dictionary<string, Symbol>> _contextStack = new Stack<Dictionary<string, Symbol>>(); 
-        private Dictionary<string, Symbol> _currentContext = new Dictionary<string, Symbol>(); // Bieżący kontekst
+        private Dictionary<string, Symbol> _currentContext = new Dictionary<string, Symbol>(); 
 
         private long _memoryEndPointer = 15;
         private int _tempVariableCounter = 0;
@@ -26,18 +26,54 @@ namespace Kompilator2024
             return Procedures.ContainsKey(procname);
         }
 
-        public long GetSymbol( string symbol)
+        public long GetSymbolOffset( string symbol)
         {
             if (CheckIfSymbolExists(symbol))
             {
                 Console.WriteLine($"Symbol '{symbol}' is already defined.");
                 return _currentContext[symbol].Offset;
             }
-
+            
             long offset = AllocMemorySingle();
             _currentContext.Add(symbol, new Symbol(symbol, offset));
             return offset;
         }
+
+        public Symbol GetSymbol(string name)
+        {
+            if (CheckIfSymbolExists(name))
+            {
+                Console.WriteLine($"Symbol '{name}' is already defined.");
+                return _currentContext[name];
+            }
+
+            throw new Exception($"This Symbol '{name}'is not exist");
+        }
+        
+        public long GetTable(string name, long begin, long end)
+        {
+            if (CheckIfSymbolExists(name))
+            {
+                Console.WriteLine($"{ErrorTextColor}Table '{name}' is already defined at {currLine}:{currColumn}.\u001B[0m");
+                Errorfound = true;
+                ErrorCounter++;
+                return -1;
+            }
+
+            if (end < begin)
+            {
+                Console.WriteLine($"{ErrorTextColor}Error '{name}' endIndex is smaller than beginIndex.\u001B[0m");
+                Errorfound = true;
+                ErrorCounter++;
+                return -1;
+            }
+
+            long offset = end - begin + 1;
+            _currentContext.Add(name, new Symbol(name, offset, begin, end));
+            return offset;
+        }
+
+        
 
         public void InitConstantVariables(string context)
         {
@@ -73,17 +109,17 @@ namespace Kompilator2024
             currLine = line;
         }
 
-        public Variable GetVariable( string name)
+        public Variable GetVariable(string name)
         {
             if (_currentContext.TryGetValue(name, out var symbol))
             {
                 return new Variable(name, symbol.Offset);
             }
 
-            GetSymbol( name);
+            
+            GetSymbol(name);
             return new Variable(name, _currentContext[name].Offset);
         }
-
         public Variable GetIterator( string name)
         {
             if (CheckIfSymbolExists(name))
@@ -103,13 +139,6 @@ namespace Kompilator2024
             var sym = new Symbol(name, offset, true, true);
             _currentContext.Add(name, sym);
             return new Variable(name, offset);
-        }
-
-        public Variable CreateTemporaryVariable()
-        {
-            string tempName = $"temp{_tempVariableCounter++}";
-            long address = GetSymbol(tempName);
-            return new Variable(tempName, address);
         }
 
         public ForLabel CreateForLabel(Variable iterator, Variable start, Variable end)
@@ -280,9 +309,9 @@ namespace Kompilator2024
             return _currentContext;
         }
 
-        public void SetSymbolOffset(string name, Variable variable)
+        public void SetSymbolOffset(string name, Symbol variable)
         {
-            _currentContext[name].Offset = variable.Address;
+            _currentContext[name].Offset = variable.Offset;
         }
 
         public void ResetContext(string name)

@@ -116,13 +116,28 @@ public class CodeGenerator
 
     public long SaveVarVal(Variable var, long memoryindex, StringBuilder sb)
     {
+        if (var == null)
+        {
+            throw new ArgumentNullException(nameof(var), "Variable cannot be null");
+        }
+
         long offset = 0;
         if (var.IsArray)
         {
+            // Sprawdzamy, czy zmienna tablicowa jest prawidłowo ustawiona
+            if (var.ArrayAddressVariable == null)
+            {
+                throw new InvalidOperationException($"Array address variable for {var.Name} is not initialized.");
+            }
             offset += SaveArrToVarMem(memoryindex, var, sb);
         }
         else
         {
+            // Sprawdzamy, czy zmienna nie jest null
+            if (var.Address == 0)
+            {
+                throw new InvalidOperationException($"Address for {var.Name} is not initialized.");
+            }
             offset += SaveToVarMem(memoryindex, var, sb);
         }
 
