@@ -4,21 +4,52 @@ namespace Kompilator2024
     {
         private Dictionary<string, Dictionary<string, Symbol>> _memSymbolMap = new Dictionary<string, Dictionary<string, Symbol>>();
         private Dictionary<string, Procedure> Procedures = new Dictionary<string, Procedure>();
+        private Dictionary<string, Symbol> _constantsDictionary = new Dictionary<string, Symbol>();
         private HashSet<string> CalledProcedures = new HashSet<string>();
         private Stack<Dictionary<string, Symbol>> _contextStack = new Stack<Dictionary<string, Symbol>>(); 
         private Dictionary<string, Symbol> _currentContext = new Dictionary<string, Symbol>(); 
-
+        
+        private List<string> _errors = new List<string>();
         private long _memoryEndPointer = 15;
         private int _tempVariableCounter = 0;
         private bool Errorfound;
-        private long ErrorCounter;
+        private long ErrorCounter=0;
         private string ErrorTextColor = "\\u001B31;1m";
         private long currColumn;
         private long currLine;
+        public void AddError(string errorMessage)
+        {
+            
+            _errors.Add(errorMessage);  
+            Errorfound = true;
+            ErrorCounter++;
+        }
+
+        public void PrintErrors()
+        {
+            if (_errors.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                foreach (var error in _errors)
+                {
+                    Console.WriteLine(error);
+                }
+                Console.ResetColor();
+            }
+        }
+        public MemoryHandler()
+        {
+            InitConstantVariables();
+        }
 
         public bool CheckIfSymbolExists( string name)
         {
             return _currentContext.ContainsKey(name);
+        }
+        
+        public bool CheckIfConstantSymbolExists( string name)
+        {
+            return _constantsDictionary.ContainsKey(name);
         }
 
         public bool CheckIfProcedureExists(string procname)
@@ -30,7 +61,6 @@ namespace Kompilator2024
         {
             if (CheckIfSymbolExists(symbol))
             {
-                Console.WriteLine($"Symbol '{symbol}' is already defined.");
                 return _currentContext[symbol].Offset;
             }
             
@@ -43,57 +73,47 @@ namespace Kompilator2024
         {
             if (CheckIfSymbolExists(name))
             {
-                Console.WriteLine($"Symbol '{name}' is already defined.");
                 return _currentContext[name];
             }
 
             throw new Exception($"This Symbol '{name}'is not exist");
         }
         
-        public long GetTable(string name, long begin, long end)
+        public void GetTable(string name, long offset, long begin, long end)
         {
             if (CheckIfSymbolExists(name))
             {
-                Console.WriteLine($"{ErrorTextColor}Table '{name}' is already defined at {currLine}:{currColumn}.\u001B[0m");
-                Errorfound = true;
-                ErrorCounter++;
-                return -1;
+                AddError($"Table '{name}' is already defined at {currLine}:{currColumn}");
+                return;
             }
 
             if (end < begin)
             {
-                Console.WriteLine($"{ErrorTextColor}Error '{name}' endIndex is smaller than beginIndex.\u001B[0m");
-                Errorfound = true;
-                ErrorCounter++;
-                return -1;
+                AddError($"Error '{name}' endIndex is smaller than beginIndex.");
+                return;
             }
 
-            long offset = end - begin + 1;
             _currentContext.Add(name, new Symbol(name, offset, begin, end));
-            return offset;
         }
 
-        
-
-        public void InitConstantVariables(string context)
+        public void InitConstantVariables()
         {
-            
-            _memSymbolMap[context].Add("1", new Symbol("1", 11));
-            _memSymbolMap[context].Add("0", new Symbol("0", 10));
+            _constantsDictionary.Add("1", new Symbol("1", 11));
+            _constantsDictionary.Add("0", new Symbol("0", 10));
         }
 
         public Variable GetConstVariable( long value)
         {
             var name = $"{value}";
 
-            if (CheckIfSymbolExists( name))
+            if (CheckIfConstantSymbolExists( name))
             {
-                return new Variable(name, _currentContext[name].Offset, value);
+                return new Variable(name, _constantsDictionary[name].Offset, value);
             }
 
             var offset = AllocMemorySingle();
             var sym = new Symbol(name, offset);
-            _currentContext.Add(name, sym);
+            _constantsDictionary.Add(name, sym);
             return new Variable(name, offset, value);
         }
 
@@ -120,16 +140,16 @@ namespace Kompilator2024
             GetSymbol(name);
             return new Variable(name, _currentContext[name].Offset);
         }
-        public Variable GetIterator( string name)
+        public Variable GetIterator(string name)
         {
             if (CheckIfSymbolExists(name))
             {
                 if (_currentContext[name].IsIterator())
                 {
-                    return new Variable(name, _currentContext[name].GotOffset());
+                    return new Variable(name, _currentContext[name].Offset);
                 }
 
-                Console.WriteLine(ErrorTextColor + " " + name + " already defined non-iterator with this name " + currLine + ":" + currColumn + ".");
+                AddError($"'{name}' already defined as a non-iterator at line '{currLine}' : '{currColumn}'");
                 Errorfound = true;
                 ErrorCounter++;
                 return new Variable(-1);
@@ -143,6 +163,11 @@ namespace Kompilator2024
 
         public ForLabel CreateForLabel(Variable iterator, Variable start, Variable end)
         {
+            var symbol = _currentContext[iterator.Name];
+            if (!symbol.isIterator)
+            {
+               AddError($"'{iterator.Name} is not an iterator");
+            }
             return new ForLabel(iterator, start, end);
         }
 
@@ -157,7 +182,8 @@ namespace Kompilator2024
         {
             if (CheckIfSymbolExists(name))
             {
-                Console.WriteLine($"{ErrorTextColor}Table '{name}' is already defined  at {currLine}:{currColumn}.\u001B[0m");
+                
+                AddError($"Table '{name}' is already defined  at line '{currLine}': '{currColumn}'");
                 Errorfound = true;
                 ErrorCounter++;
                 return -1;
@@ -165,7 +191,7 @@ namespace Kompilator2024
 
             if (end < begin)
             {
-                Console.WriteLine($"{ErrorTextColor}Error '{name}' endIndex is smaller than beginIndex.\u001B[0m");
+                AddError($"Error '{name}' endIndex is smaller than beginIndex at line '{currLine}': '{currColumn}.");
                 Errorfound = true;
                 ErrorCounter++;
                 return -1;
@@ -176,7 +202,7 @@ namespace Kompilator2024
             return offset;
         }
 
-        public Variable GetArrValNum( string name, long pos)
+        public Variable GetArrValNum(string name, long pos)
         {
             Symbol sym = _currentContext[name];
 
@@ -187,32 +213,28 @@ namespace Kompilator2024
 
             if (!sym.isArrayy())
             {
-                Console.WriteLine($"{ErrorTextColor}Error '{name}' variable is not in array '{currLine} : '{currColumn}'.\u001B[0m");
-                Errorfound = true;
-                ErrorCounter++;
+                AddError($"Error '{name}' variable is not in array at line '{currLine}' : '{name}' is declared as casual in line '{currColumn}'");
                 return null;
             }
 
             if (sym.ArrayEndIdx < pos || sym.ArrayBeginIdx > pos)
             {
-                Console.WriteLine($"{ErrorTextColor}Error '{name}' ['{pos}'] out of bounds in '{currLine} : '{currColumn}'.\u001B[0m");
-                Errorfound = true;
-                ErrorCounter++;
+                AddError($"Error '{name}' ['{pos}'] out of bounds at line '{currLine}' : '{currColumn}'");
                 return null;
             }
 
-            Variable ret_pos = GetConstVariable( pos);
+            Variable ret_pos = GetConstVariable(pos);
             Variable offsetVar = GetConstVariable(sym.ArrayBeginIdx);
             Variable adressVar = GetConstVariable(sym.GotOffset());
 
-            Variable ret = new Variable(sym.GotOffset(), ret_pos, offsetVar, adressVar);
-            return ret;
+            return new Variable(sym.GotOffset(), ret_pos, offsetVar, adressVar);
         }
 
         public Variable GetArrValVar(string name, string pos_var)
         {
             Symbol sym = _currentContext[name];
             Symbol pos = _currentContext[pos_var];
+
             if (sym == null || pos == null)
             {
                 return null;
@@ -220,27 +242,21 @@ namespace Kompilator2024
 
             if (!sym.isArrayy())
             {
-                Console.WriteLine($"{ErrorTextColor}Error '{name}' variable is not in array '{currLine} : '{currColumn}'.\u001B[0m");
-                Errorfound = true;
-                ErrorCounter++;
+                AddError($"Error '{name}' variable is not in array at line '{currLine} : '{currColumn}'.");
                 return null;
             }
             else if (pos.isArrayy())
             {
-                Console.WriteLine($"{ErrorTextColor}Error '{name}' position symbol is in array '{currLine} : '{currColumn}'.\u001B[0m");
-                Errorfound = true;
-                ErrorCounter++;
+                AddError($"Error '{name}' position symbol is in array at line '{currLine} : '{currColumn}'.");
                 return null;
             }
 
             Variable posVar = GetVariable(pos.Name);
-            Variable offsetVar = GetConstVariable( sym.ArrayBeginIdx);
-            Variable adressVar = GetConstVariable( sym.GotOffset());
+            Variable offsetVar = GetConstVariable(sym.ArrayBeginIdx);
+            Variable adressVar = GetConstVariable(sym.GotOffset());
 
-            Variable ret = new Variable(sym.GotOffset(), posVar, offsetVar, adressVar);
-            return ret;
+            return new Variable(sym.GotOffset(), posVar, offsetVar, adressVar);
         }
-
         public Variable CopyVariable( Variable var)
         {
             var name = $"{var.Name}-Copy";
@@ -267,11 +283,11 @@ namespace Kompilator2024
         {
             if (CheckIfProcedureExists(funcName))
             {
-                throw new Exception($"Function '{funcName}' is already declared!");
+                AddError($"Function '{funcName}' is already declared!");
+                return;
             }
 
             _memSymbolMap[funcName] = new Dictionary<string, Symbol>();
-            InitConstantVariables(funcName);
         }
 
 
@@ -284,12 +300,12 @@ namespace Kompilator2024
         {
             if (!CheckIfProcedureExists(name))
             {
-                throw new Exception($"Function '{name} doesn't exist");
+                AddError($"Function '{name}' doesn't exist");
+                return null;  // Zwrócenie null w przypadku błędu
             }
 
             return Procedures[name];
         }
-
         public void SetContext(string context)
         {
             if (!_memSymbolMap.ContainsKey(context))
@@ -316,9 +332,18 @@ namespace Kompilator2024
 
         public void ResetContext(string name)
         {
+            if (!_memSymbolMap.ContainsKey(name))
+            {
+                AddError($"Context '{name}' is not declared");
+                return;
+            }
             _memSymbolMap[name].Clear();
             _currentContext.Clear();
-            InitConstantVariables(name);
+        }
+
+        public List<string> GetErrors()
+        {
+            return _errors;
         }
     }
 }

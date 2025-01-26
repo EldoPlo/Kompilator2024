@@ -2,7 +2,7 @@ grammar l4;
 WS: [ \t\r\n]+ -> skip;
 WHITESPACE: ('\t' | ' ' | '\r' | '\n'| '\u000C')+ ;
 PIDENTIFIER: [_a-z]+;
-NUM : '-'?[0-9]+;
+
 PROCEDURE: 'PROCEDURE';
 IS: 'IS';
 BEGIN: 'BEGIN';
@@ -50,6 +50,15 @@ command      : identifier ':=' expression';' #Assign
              | proc_call';' #Call
              | READ identifier';' #Read
              | WRITE value';' #Write;
+             
+expression   : left=value '+' right=value #Add
+             | left=value '-' right=value #Sub
+             | left=value '*' right=value #Mul
+             | left=value '/' right=value #Div
+             | left=value '%' right=value #Mod
+             | value #Eval;
+             
+NUM : '-'?[0-9]+;
 
 proc_head    : PIDENTIFIER '(' args_decl ')';
 
@@ -68,12 +77,6 @@ args_decl    : args_decl',' PIDENTIFIER
 args         : args',' PIDENTIFIER
              | PIDENTIFIER;
 
-expression   : left=value '+' right=value #Add
-             | left=value '-' right=value #Sub
-             | left=value '*' right=value #Mul
-             | left=value '/' right=value #Div
-             | left=value '%' right=value #Mod
-             | value #Eval;
 
 condition    : left=value '=' right=value #Eq
              | left=value '!=' right=value #Neq

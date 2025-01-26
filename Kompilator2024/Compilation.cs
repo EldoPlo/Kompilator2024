@@ -10,9 +10,9 @@ namespace Kompilator2024
             string msg, RecognitionException e)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-
+          
             // Print the error message
-            Console.WriteLine($"Syntax error at line {line}:{charPositionInLine} - {msg}");
+            Console.WriteLine($"Syntax error at line lalala {line}:{charPositionInLine} - {msg}");
 
             // Reset the text color
             Console.ResetColor();        }
@@ -26,24 +26,44 @@ namespace Kompilator2024
             var memory = new MemoryHandler();
             var codegen = new CodeGenerator();
             var parser = new l4Parser(tokens);
+            var visitor = new LanguageVisitor(memory, codegen);
             parser.RemoveErrorListeners();
             parser.AddErrorListener(new MyErrorListener());
             var tree = parser.program_all();
+            if (visitor.GetErrors().Count != 0 || memory.GetErrors().Count != 0)
+            {
+                visitor.PrintErrors();
+                memory.GetErrors();
+                throw new Exception("COMPILATION ERROR");
+            }
             if (parser.NumberOfSyntaxErrors != 0)
             {
                 throw new Exception("PROBLEM W KOMPILACJI");
             }
 
-            var visitor = new LanguageVisitor(memory, codegen);
-            var result = visitor.Visit(tree);
-
-            if (result == null)
+           
+          
+            try
             {
-                Console.WriteLine("Błąd: Wynik odwiedzenia drzewa jest pusty (null).");
-                return;
-            }
+                var result = visitor.Visit(tree);
+                if (result == null)
+                {
+                    Console.WriteLine("Błąd: Wynik odwiedzenia drzewa jest pusty (null).");
+                    return;
+                }
 
-            WriteCode(output, result);
+                WriteCode(output, result);
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
+                
+            }
+            
+
+         
         }
 
         private void WriteCode(string path, VisitorDataTransmiter result)
@@ -55,9 +75,9 @@ namespace Kompilator2024
             }
             else
             {
-                Console.WriteLine("Zawartość CodeBuilder:");
-                Console.WriteLine(result.CodeBuilder.ToString()); 
-                File.WriteAllText(path, result.CodeBuilder.ToString());
+                // Console.WriteLine("Zawartość CodeBuilder:");
+                // Console.WriteLine(result.CodeBuilder.ToString()); 
+                // File.WriteAllText(path, result.CodeBuilder.ToString());
             }
         }
     }

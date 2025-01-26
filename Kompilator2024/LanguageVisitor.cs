@@ -15,15 +15,35 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     private List<string> currentparrams = new List<string>();
     private List<string> currentdeclarations = new List<string>();
     private List<Symbol> currentargs = new List<Symbol>();
+    private List<string> _errors = new List<string>();
+    private bool Errorfound;
+    private long ErrorCounter=0;
     
-    
-
     public LanguageVisitor(MemoryHandler memoryHandler, CodeGenerator codeGenerator)
     {
         _memoryHandler = memoryHandler;
         _codeGenerator = codeGenerator;
     }
+    public void AddError(string errorMessage)
+    {
+        
+        _errors.Add(errorMessage);  
+        Errorfound = true;
+        ErrorCounter++;
+    }
 
+    public void PrintErrors()
+    {
+        if (_errors.Count > 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            foreach (var error in _errors)
+            {
+                Console.WriteLine(error);
+            }
+            Console.ResetColor();
+        }
+    }
     public override VisitorDataTransmiter VisitWithProcedures(l4Parser.WithProceduresContext ctx)
     {
         var dataTransmiter = new VisitorDataTransmiter();
@@ -132,7 +152,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
             
             
-            _memoryHandler.GetTable(paramName, currentargs[i].ArrayBeginIdx, currentargs[i].ArrayEndIdx); 
+            _memoryHandler.GetTable(paramName, currentargs[i].Offset, currentargs[i].ArrayBeginIdx, currentargs[i].ArrayEndIdx); 
         }
         else
         {
@@ -229,12 +249,12 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
     public override VisitorDataTransmiter VisitPutSymbol1(l4Parser.PutSymbol1Context ctx)
     {
-        Visit(ctx.declarations());
+        var ret = Visit(ctx.declarations());
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         _memoryHandler.GetSymbolOffset(ctx.PIDENTIFIER().GetText());
         currentdeclarations.Add(ctx.PIDENTIFIER().GetText());
 
-        return new VisitorDataTransmiter();
+        return ret;
 
     }
     
@@ -407,29 +427,50 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         return dataTransmitter;
     }
 
-    public override VisitorDataTransmiter VisitAssign(l4Parser.AssignContext ctx)
+   public override VisitorDataTransmiter VisitAssign(l4Parser.AssignContext ctx)
+{
+    var identifierDataTransmitter = Visit(ctx.identifier());
+    var expressionDataTransmiter = Visit(ctx.expression());
+    var dataTransmiter = new VisitorDataTransmiter();
+
+    if (identifierDataTransmitter != null && expressionDataTransmiter != null)
     {
-        var identifierDataTransmitter = Visit(ctx.identifier());
-        var expressionDataTransmiter = Visit(ctx.expression());
-        var dataTransmiter = new VisitorDataTransmiter();
+        var variable = identifierDataTransmitter.Variable;
 
-        if (identifierDataTransmitter != null && expressionDataTransmiter != null)
+       
+        if (_memoryHandler.GetSymbol(variable.Name).IsIterator())
         {
-            var variable = identifierDataTransmitter.Variable;
-
-            dataTransmiter.CodeBuilder.Append(expressionDataTransmiter.CodeBuilder);
-
-            var offset = _codeGenerator.Assign(variable,  expressionDataTransmiter.Variable, dataTransmiter.CodeBuilder);
-
-            dataTransmiter.Offset += offset;
-            return dataTransmiter;
+            _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name)}' wewnątrz pętli na linii {ctx.Start.Line}");
         }
-        else
+        
+      
+        if (_memoryHandler.GetSymbol(variable.Name).isArrayy())
         {
-            Console.WriteLine("Błąd: Brak identyfikatora lub wyrażenia dla przypisania.");
+            _memoryHandler.AddError($"Nie można przypisać wartości do tablicy '{_memoryHandler.GetSymbol(variable.Name)}' na linii {ctx.Start.Line}.");
         }
+
+        if (_memoryHandler.GetSymbol(expressionDataTransmiter.Variable.Name).isArrayy())
+        {
+            _memoryHandler.AddError($"Nie można przypisać tablicy '{expressionDataTransmiter.Variable.Name}' do zmiennej '{_memoryHandler.GetSymbol(expressionDataTransmiter.Variable.Name)}' na linii {ctx.Start.Line}.");
+        }
+
+      
+
+       
+        dataTransmiter.CodeBuilder.Append(expressionDataTransmiter.CodeBuilder);
+        var offset = _codeGenerator.Assign(variable, expressionDataTransmiter.Variable, dataTransmiter.CodeBuilder);
+
+        dataTransmiter.Offset += offset;
         return dataTransmiter;
     }
+    else
+    {
+        
+        _memoryHandler.AddError($"Błąd: Brak identyfikatora lub wyrażenia dla przypisania na linii {ctx.Start.Line}.");
+    }
+    
+    return dataTransmiter;
+}
 
     public override VisitorDataTransmiter VisitIf(l4Parser.IfContext ctx)
     {
@@ -742,7 +783,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
     private VisitorDataTransmiter GenerateNum(long numVal)
     {
-        if (_memoryHandler.CheckIfSymbolExists(numVal.ToString()))
+        if (_memoryHandler.CheckIfConstantSymbolExists(numVal.ToString()))
         {
             var var = _memoryHandler.GetConstVariable(numVal);
             var ret_existing =  new VisitorDataTransmiter(var);
@@ -755,5 +796,10 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         _codeGenerator.GetConstToMemory(numVal, variable.Address, ret.CodeBuilder);
 
         return ret;
+    }
+
+    public List<string> GetErrors()
+    {
+        return _errors;
     }
 }

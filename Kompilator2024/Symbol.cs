@@ -12,6 +12,8 @@ public class Symbol
      public  bool isArray;
      public  bool isIterator;
      private bool isProcedure;
+     public bool isMutable;
+     public bool isAsigned;
     
      private  long Size;
      public  long ArrayBeginIdx { get; set; }
@@ -56,6 +58,7 @@ public class Symbol
         isArray = false;
         isIterator = true;
         isProcedure = false;
+        isMutable = true;
         
         Size = 1;
         ArrayBeginIdx = 0;
