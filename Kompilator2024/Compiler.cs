@@ -33,6 +33,10 @@ class Compiler
 
             
             compiler.Calculate(inputContent, outputFileName);
+            if (compiler.isValid)
+            {
+                return;
+            }
             Console.WriteLine("Obliczenia zakończone pomyślnie.");
 
            

@@ -149,7 +149,6 @@ public class CodeGenerator
         var offset = 0L;
         offset += GetVarVal(var, 0, sb);
         sb.AppendLine($"PUT 0");
-        Console.WriteLine($"Po WRITE, CodeBuilder: {sb.ToString()}");
         return 1 + offset;
     }
 
@@ -166,9 +165,7 @@ public class CodeGenerator
    
     public long Read(Variable var, StringBuilder sb)
     {
-        Console.WriteLine($"Generowanie READ: GET {var.Address}");
         sb.AppendLine($"GET {var.Address}");
-        Console.WriteLine($"Po READ, CodeBuilder: {sb.ToString()}");
         return 1;
     }
 

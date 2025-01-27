@@ -1,4 +1,5 @@
 grammar l4;
+COMMENT: '#' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 WHITESPACE: ('\t' | ' ' | '\r' | '\n'| '\u000C')+ ;
 PIDENTIFIER: [_a-z]+;

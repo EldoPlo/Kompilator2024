@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Antlr4.Runtime;
 
 namespace Kompilator2024
@@ -19,6 +20,7 @@ namespace Kompilator2024
     }
     public class Compilation
     {
+        public bool isValid = false;
         public void Calculate(string input, string output)
         {
             var lexer = new l4Lexer(new AntlrInputStream(input));
@@ -27,8 +29,11 @@ namespace Kompilator2024
             var codegen = new CodeGenerator();
             var parser = new l4Parser(tokens);
             var visitor = new LanguageVisitor(memory, codegen);
+            
             parser.RemoveErrorListeners();
             parser.AddErrorListener(new MyErrorListener());
+
+           
             var tree = parser.program_all();
            
             if (parser.NumberOfSyntaxErrors != 0)
@@ -48,6 +53,7 @@ namespace Kompilator2024
                 }
                 if (visitor.GetErrors().Count != 0 || memory.GetErrors().Count != 0)
                 {
+                    isValid = true;
                     List<string> allerrors = new List<string>();
                     allerrors.AddRange(visitor.GetErrors());
                     allerrors.AddRange(memory.GetErrors());
