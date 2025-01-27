@@ -16,6 +16,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     private List<string> currentdeclarations = new List<string>();
     private List<Symbol> currentargs = new List<Symbol>();
     private List<string> _errors = new List<string>();
+    
     private bool Errorfound;
     private long ErrorCounter=0;
     
@@ -113,7 +114,23 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
             var declaretions = Visit(ctx.declarations());
             procedure.DeclarationsContext = ctx.declarations();
             procedure.Declaretions = new List<string>(currentdeclarations);
-            //TODO Sprawdzic, czy nie sa zadeklarowane te same nazwy co argumenty
+           
+            foreach (var declaration in procedure.Declaretions)
+            {
+                
+                foreach (var param in procedure.Parameters)
+                {
+                    var normalizedParam = RemoveTablePrefix(param);  
+                    Console.WriteLine(normalizedParam);
+
+                   
+                    if (normalizedParam == declaration)
+                    {
+                        _memoryHandler.AddError($"Variable '{declaration}' declared in procedure '{procedure.Name}' conflicts with its parameter '{param}' Cannot declare variable with the same name as parameter in one function.",ctx.Start.Line + 1);
+                    }
+                }
+                
+            }
             currentdeclarations.Clear();
         }
        
@@ -127,8 +144,23 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     var datatransmiter = new VisitorDataTransmiter();
     Visit(ctx.args());  
 
-    var function = _memoryHandler.GetFunction(ctx.PIDENTIFIER().GetText());  
-
+    var function = _memoryHandler.GetFunction(ctx.PIDENTIFIER().GetText());
+  
+    if (function.isValid)
+    {
+        if (!function.isCalled)
+        {
+            _memoryHandler.AddError($"Attempt to call an undeclared procedure '{ctx.PIDENTIFIER().GetText()}'.", ctx.Start.Line);
+        }
+        else if (function.isCalled)
+        {
+            _memoryHandler.AddError($"Recursive call to the procedure '{ctx.PIDENTIFIER().GetText()}'.", ctx.Start.Line);
+        }
+        return datatransmiter;
+    }
+ 
+   
+    _memoryHandler.CalledProcedures.Add(function.Name);
    
     if (currentargs.Count != function.Parameters.Count)
     {
@@ -137,12 +169,13 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
     var currentcontext = _memoryHandler.GetCurrentContext();  
     _memoryHandler.SetContext(function.Name);  
+    
     _memoryHandler.ResetContext(function.Name);  
 
     for (int i = 0; i < currentargs.Count; i++)
     {
         var originalParam = function.Parameters[i]; 
-        var paramName = originalParam;  
+        var paramName = originalParam;
 
         
         if (originalParam.StartsWith("T ")) 
@@ -154,6 +187,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
             
             _memoryHandler.GetTable(paramName, currentargs[i].Offset, currentargs[i].ArrayBeginIdx, currentargs[i].ArrayEndIdx); 
         }
+      
         else
         {
             
@@ -161,11 +195,17 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
             _memoryHandler.SetSymbolOffset(paramName, currentargs[i]);
         }
 
+
+        if (!(_memoryHandler.GetSymbol(paramName).isArray) && currentargs[i].isArray)
+        {
+            _memoryHandler.AddError($"Invalid args Type during calling calling function '{function.Name}'",ctx.Start.Line);
+        }
+
         
       
     }
 
-    
+ 
     currentargs.Clear();
 
     
@@ -177,7 +217,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     
     datatransmiter.CodeBuilder.Append(Visit(function.CommandsContext).CodeBuilder);
 
-    
+    _memoryHandler.CalledProcedures.Remove(function.Name);
     _memoryHandler.ResetContext(function.Name);
     _memoryHandler.SetContext(currentcontext);
 
@@ -440,23 +480,8 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
        
         if (_memoryHandler.GetSymbol(variable.Name).IsIterator())
         {
-            _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name)}' wewnątrz pętli na linii {ctx.Start.Line}");
+            _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name).Name}' wewnątrz pętli na linii {ctx.Start.Line}",ctx.Start.Line);
         }
-        
-      
-        if (_memoryHandler.GetSymbol(variable.Name).isArrayy())
-        {
-            _memoryHandler.AddError($"Nie można przypisać wartości do tablicy '{_memoryHandler.GetSymbol(variable.Name)}' na linii {ctx.Start.Line}.");
-        }
-
-        if (_memoryHandler.GetSymbol(expressionDataTransmiter.Variable.Name).isArrayy())
-        {
-            _memoryHandler.AddError($"Nie można przypisać tablicy '{expressionDataTransmiter.Variable.Name}' do zmiennej '{_memoryHandler.GetSymbol(expressionDataTransmiter.Variable.Name)}' na linii {ctx.Start.Line}.");
-        }
-
-      
-
-       
         dataTransmiter.CodeBuilder.Append(expressionDataTransmiter.CodeBuilder);
         var offset = _codeGenerator.Assign(variable, expressionDataTransmiter.Variable, dataTransmiter.CodeBuilder);
 
@@ -466,7 +491,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     else
     {
         
-        _memoryHandler.AddError($"Błąd: Brak identyfikatora lub wyrażenia dla przypisania na linii {ctx.Start.Line}.");
+        _memoryHandler.AddError($"Błąd: Brak identyfikatora lub wyrażenia dla przypisania na linii {ctx.Start.Line}.",ctx.Start.Line);
     }
     
     return dataTransmiter;
@@ -797,7 +822,11 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
         return ret;
     }
-
+    private string RemoveTablePrefix(string name)
+    {
+        // Jeśli nazwa zaczyna się od "T ", zwróć samą nazwę bez prefiksu
+        return name.StartsWith("T ") ? name.Substring(2) : name;
+    }
     public List<string> GetErrors()
     {
         return _errors;

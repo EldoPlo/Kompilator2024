@@ -142,48 +142,6 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitWrite([NotNull] l4Parser.WriteContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Add</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitAdd([NotNull] l4Parser.AddContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Sub</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitSub([NotNull] l4Parser.SubContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Mul</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitMul([NotNull] l4Parser.MulContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Div</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDiv([NotNull] l4Parser.DivContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Mod</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitMod([NotNull] l4Parser.ModContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>Eval</c>
-	/// labeled alternative in <see cref="l4Parser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitEval([NotNull] l4Parser.EvalContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="l4Parser.proc_head"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -235,6 +193,48 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitArgs([NotNull] l4Parser.ArgsContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Add</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAdd([NotNull] l4Parser.AddContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Sub</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSub([NotNull] l4Parser.SubContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Mul</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMul([NotNull] l4Parser.MulContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Div</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDiv([NotNull] l4Parser.DivContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Mod</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMod([NotNull] l4Parser.ModContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Eval</c>
+	/// labeled alternative in <see cref="l4Parser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEval([NotNull] l4Parser.EvalContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Eq</c>
 	/// labeled alternative in <see cref="l4Parser.condition"/>.

@@ -20,7 +20,12 @@ public class Variable
         Name = name;
         ArrayAddress = -1;
     }
-    
+
+    public static Variable InvalidVariable(long address)
+    {
+        return new Variable("invalid", address);
+        
+    }
     public Variable(long address, long arrayAddress)
     {
         Address= address;

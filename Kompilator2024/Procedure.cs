@@ -7,6 +7,8 @@ namespace Kompilator2024
         public List<string> Parameters { get; }
         public List<string> Declaretions { get; set; }
         public bool IsExecuted { get; private set; }
+        public bool isValid;
+        public bool isCalled;
         public Dictionary<string, Symbol> ExecutionContext { get; private set; }
 
         public l4Parser.CommandsContext CommandsContext;
@@ -18,9 +20,34 @@ namespace Kompilator2024
             Parameters = parameters ?? new List<string>();
             IsExecuted = false;
             ExecutionContext = new Dictionary<string, Symbol>();
-           
+            isValid = false;
+            isCalled = false;
+
         }
 
+        public Procedure(string name)
+        {
+            Name = "invalid";
+            isValid = true;
+            isCalled = false;
+        }
+
+        public Procedure(string name, bool init = true)
+        {
+            Name = "called";
+            isValid = true;
+        }
+        public static Procedure InvalidCalledProcedure()
+        {
+            return new Procedure("called") {isValid = true, isCalled = true};
+        
+        }
+        
+        public static Procedure InvalidProcedure()
+        {
+            return new Procedure("invalid"){isValid = true, isCalled = false};
+        
+        }
         // public void AddLocalVariable(Variable variable)
         // {
         //     if (LocalVariables.Exists(v => v.Name == variable.Name))
@@ -35,6 +62,11 @@ namespace Kompilator2024
         {
             IsExecuted = true;
             ExecutionContext = context;
+        }
+
+        public bool ISValid()
+        {
+            return isValid;
         }
         //
         // public List<string> GetParameterNames()

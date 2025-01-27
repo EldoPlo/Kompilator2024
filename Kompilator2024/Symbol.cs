@@ -58,7 +58,7 @@ public class Symbol
         isArray = false;
         isIterator = true;
         isProcedure = false;
-        isMutable = true;
+        
         
         Size = 1;
         ArrayBeginIdx = 0;

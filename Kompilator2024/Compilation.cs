@@ -30,12 +30,7 @@ namespace Kompilator2024
             parser.RemoveErrorListeners();
             parser.AddErrorListener(new MyErrorListener());
             var tree = parser.program_all();
-            if (visitor.GetErrors().Count != 0 || memory.GetErrors().Count != 0)
-            {
-                visitor.PrintErrors();
-                memory.GetErrors();
-                throw new Exception("COMPILATION ERROR");
-            }
+           
             if (parser.NumberOfSyntaxErrors != 0)
             {
                 throw new Exception("PROBLEM W KOMPILACJI");
@@ -48,8 +43,15 @@ namespace Kompilator2024
                 var result = visitor.Visit(tree);
                 if (result == null)
                 {
-                    Console.WriteLine("Błąd: Wynik odwiedzenia drzewa jest pusty (null).");
+                    throw new Exception("Błąd: Wynik odwiedzenia drzewa jest pusty (null).");
                     return;
+                }
+                if (visitor.GetErrors().Count != 0 || memory.GetErrors().Count != 0)
+                {
+                    List<string> allerrors = new List<string>();
+                    allerrors.AddRange(visitor.GetErrors());
+                    allerrors.AddRange(memory.GetErrors());
+                    throw new Exception(string.Join("\n", allerrors));
                 }
 
                 WriteCode(output, result);
@@ -77,7 +79,7 @@ namespace Kompilator2024
             {
                 // Console.WriteLine("Zawartość CodeBuilder:");
                 // Console.WriteLine(result.CodeBuilder.ToString()); 
-                // File.WriteAllText(path, result.CodeBuilder.ToString());
+                File.WriteAllText(path, result.CodeBuilder.ToString());
             }
         }
     }
