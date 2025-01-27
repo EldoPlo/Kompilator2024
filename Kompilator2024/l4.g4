@@ -3,7 +3,7 @@ COMMENT: '#' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 WHITESPACE: ('\t' | ' ' | '\r' | '\n'| '\u000C')+ ;
 PIDENTIFIER: [_a-z]+;
-NUM : '-'?[0-9]+;
+NUM : [0-9]+;
 PROCEDURE: 'PROCEDURE';
 IS: 'IS';
 BEGIN: 'BEGIN';
@@ -87,6 +87,7 @@ condition    : left=value '=' right=value #Eq
              | left=value '<=' right=value #Leq;
 
 value        : NUM #Num
+             | '-' NUM #NegNum
              | identifier #Id;
 
 identifier   : PIDENTIFIER #GetPIDENTIFIER

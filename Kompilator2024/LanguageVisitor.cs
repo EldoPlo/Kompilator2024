@@ -352,11 +352,11 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
             return dataTransmiter;
         }
 
-
+        
         var variable = valueContext.Variable;
-        _codeGenerator.Write(variable, dataTransmiter.CodeBuilder);
+        _codeGenerator.Write(variable, valueContext.CodeBuilder);
 
-        return dataTransmiter;
+        return valueContext;
     }
     
     public override VisitorDataTransmiter VisitRead(l4Parser.ReadContext ctx)
@@ -773,6 +773,14 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         var numValue = long.Parse(ctx.NUM().GetText());
         return GenerateNum(numValue);
     }
+
+    public override VisitorDataTransmiter VisitNegNum(l4Parser.NegNumContext ctx)
+    {
+        var negnumValue = long.Parse(ctx.NUM().GetText());
+        return GenerateNum(-negnumValue);
+
+    }
+    
 
     public override VisitorDataTransmiter VisitId(l4Parser.IdContext ctx)
     {

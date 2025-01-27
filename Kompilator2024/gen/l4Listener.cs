@@ -463,6 +463,18 @@ public interface Il4Listener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitNum([NotNull] l4Parser.NumContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>NegNum</c>
+	/// labeled alternative in <see cref="l4Parser.value"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterNegNum([NotNull] l4Parser.NegNumContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>NegNum</c>
+	/// labeled alternative in <see cref="l4Parser.value"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitNegNum([NotNull] l4Parser.NegNumContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Id</c>
 	/// labeled alternative in <see cref="l4Parser.value"/>.
 	/// </summary>

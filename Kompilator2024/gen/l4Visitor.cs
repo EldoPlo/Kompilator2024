@@ -285,6 +285,13 @@ public interface Il4Visitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNum([NotNull] l4Parser.NumContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>NegNum</c>
+	/// labeled alternative in <see cref="l4Parser.value"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNegNum([NotNull] l4Parser.NegNumContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>Id</c>
 	/// labeled alternative in <see cref="l4Parser.value"/>.
 	/// </summary>

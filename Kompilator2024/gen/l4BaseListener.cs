@@ -542,6 +542,20 @@ public partial class l4BaseListener : Il4Listener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitNum([NotNull] l4Parser.NumContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>NegNum</c>
+	/// labeled alternative in <see cref="l4Parser.value"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterNegNum([NotNull] l4Parser.NegNumContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>NegNum</c>
+	/// labeled alternative in <see cref="l4Parser.value"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitNegNum([NotNull] l4Parser.NegNumContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Id</c>
 	/// labeled alternative in <see cref="l4Parser.value"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -87,6 +87,7 @@ public class CodeGenerator
         {
             offset += GetArrVarToMem(var, memoryindex, sb);
         }
+        
         else
         {
             offset += GetVarToMemory(var, memoryindex, sb);
