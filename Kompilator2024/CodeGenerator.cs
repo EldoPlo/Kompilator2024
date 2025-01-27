@@ -133,8 +133,8 @@ public class CodeGenerator
         }
         else
         {
-            // Sprawdzamy, czy zmienna nie jest null
-            if (var.Address == 0)
+            
+            if (var.Address == 0 && var.Name != "validsymbol")
             {
                 throw new InvalidOperationException($"Address for {var.Name} is not initialized.");
             }
