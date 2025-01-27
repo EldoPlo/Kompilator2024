@@ -120,10 +120,8 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
                 
                 foreach (var param in procedure.Parameters)
                 {
-                    var normalizedParam = RemoveTablePrefix(param);  
-                    Console.WriteLine(normalizedParam);
+                    var normalizedParam = RemoveTablePrefix(param);
 
-                   
                     if (normalizedParam == declaration)
                     {
                         _memoryHandler.AddError($"Variable '{declaration}' declared in procedure '{procedure.Name}' conflicts with its parameter '{param}' Cannot declare variable with the same name as parameter in one function.",ctx.Start.Line + 1);
@@ -344,7 +342,6 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
     public override VisitorDataTransmiter VisitWrite(l4Parser.WriteContext ctx)
     {
-        Console.WriteLine("Znaleziono komendę WRITE");
 
         var valueContext = Visit(ctx.value());
         var dataTransmiter = new VisitorDataTransmiter();

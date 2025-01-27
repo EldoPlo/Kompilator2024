@@ -69,9 +69,6 @@ namespace Kompilator2024
                 Console.ResetColor();
                 
             }
-            
-
-         
         }
 
         private void WriteCode(string path, VisitorDataTransmiter result)
@@ -83,8 +80,6 @@ namespace Kompilator2024
             }
             else
             {
-                // Console.WriteLine("Zawartość CodeBuilder:");
-                // Console.WriteLine(result.CodeBuilder.ToString()); 
                 File.WriteAllText(path, result.CodeBuilder.ToString());
             }
         }
