@@ -74,6 +74,10 @@ public class Symbol
         isProcedure = true;
     }
 
+    public Symbol()
+    {
+        Name = "validSymbol";
+    }
     
     public bool isArrayy()
     {

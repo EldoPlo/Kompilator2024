@@ -89,7 +89,7 @@ namespace Kompilator2024
                 return _constantsDictionary[name];
             }
 
-            throw new Exception($"This Symbol '{name}'is not exist in '{currLine}");
+            return new Symbol {Name = "validsymbol" };
         }
 
         public void GetTable(string name, long offset, long begin, long end)
@@ -154,8 +154,13 @@ namespace Kompilator2024
                 return new Variable(name, symbol.Offset);
             }
 
-
+            var errname = name;
             GetSymbol(name);
+            if (GetSymbol(name).Name == "validsymbol")
+            {
+                AddError($"Uknown variable '{errname}'", currLine);
+                return new Variable("validsymbol");
+            }
             return new Variable(name, _currentContext[name].Offset);
         }
 

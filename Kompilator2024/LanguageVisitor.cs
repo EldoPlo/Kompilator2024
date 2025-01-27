@@ -482,6 +482,8 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         {
             _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name).Name}' wewnątrz pętli na linii {ctx.Start.Line}",ctx.Start.Line);
         }
+
+       
         dataTransmiter.CodeBuilder.Append(expressionDataTransmiter.CodeBuilder);
         var offset = _codeGenerator.Assign(variable, expressionDataTransmiter.Variable, dataTransmiter.CodeBuilder);
 

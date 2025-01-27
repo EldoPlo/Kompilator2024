@@ -66,6 +66,12 @@ public class Variable
         IsSet = true;
     }
 
+    public Variable(string name)
+    {
+        Name = name;
+        IsSet = true;
+    }
+
     // Const constructor
     public Variable(string name, long address, long value)
     {
