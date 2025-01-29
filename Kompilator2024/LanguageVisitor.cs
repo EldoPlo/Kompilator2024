@@ -16,6 +16,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
     private List<string> currentdeclarations = new List<string>();
     private List<Symbol> currentargs = new List<Symbol>();
     private List<string> _errors = new List<string>();
+    private bool isIninitialaizngCommand = false;
     
     private bool Errorfound;
     private long ErrorCounter=0;
@@ -52,6 +53,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
         var proc_ret = Visit(ctx.procedures());
         dataTransmiter.CodeBuilder.Append(proc_ret.CodeBuilder);
         _memoryHandler.DeclareFunction("main");
+        
         _codeGenerator.InitConstants(dataTransmiter.CodeBuilder);
       
         _memoryHandler.SetContext("main");
@@ -59,6 +61,7 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
         dataTransmiter.CodeBuilder.Append(main_ret.CodeBuilder);
         
         _codeGenerator.End(dataTransmiter.CodeBuilder);
+        _memoryHandler.ValidateProcedureOrder();
         return dataTransmiter;
     }
 
@@ -78,7 +81,9 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
 
     public override VisitorDataTransmiter VisitProc_head(l4Parser.Proc_headContext ctx)
     {
-        _memoryHandler.DeclareFunction(ctx.PIDENTIFIER().GetText());
+        var funcName = ctx.PIDENTIFIER().GetText();
+        _memoryHandler.DeclareFunction(funcName);
+        _memoryHandler.RegisterProcedure(funcName,ctx.Start.Line);
         Visit(ctx.args_decl());
         Procedure procedure = new Procedure(ctx.PIDENTIFIER().GetText(), new List<string>(currentparrams));
         _memoryHandler.AddFunction(procedure);
@@ -133,6 +138,8 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
         }
        
         procedure.CommandsContext = ctx.commands();
+
+
         _memoryHandler.SetContext(currentContext);
         return new VisitorDataTransmiter();
     }
@@ -140,10 +147,12 @@ public class LanguageVisitor : l4BaseVisitor<VisitorDataTransmiter>
 public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext ctx)
 {
     var datatransmiter = new VisitorDataTransmiter();
-    Visit(ctx.args());  
-
-    var function = _memoryHandler.GetFunction(ctx.PIDENTIFIER().GetText());
-  
+    Visit(ctx.args());
+    var funcName = ctx.PIDENTIFIER().GetText();
+    var function = _memoryHandler.GetFunction(funcName);
+    
+    
+    _memoryHandler.RegisterProcedureCall(funcName, ctx.Start.Line); 
     if (function.isValid)
     {
         if (!function.isCalled)
@@ -154,22 +163,26 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         {
             _memoryHandler.AddError($"Recursive call to the procedure '{ctx.PIDENTIFIER().GetText()}'.", ctx.Start.Line);
         }
+       
         return datatransmiter;
     }
+   
  
    
-    _memoryHandler.CalledProcedures.Add(function.Name);
+    _memoryHandler.CalledProcedures.Push(function.Name);
    
     if (currentargs.Count != function.Parameters.Count)
     {
-        throw new Exception($"Invalid number of parameters");
+        AddError("TRARlala in ");
     }
 
     var currentcontext = _memoryHandler.GetCurrentContext();  
     _memoryHandler.SetContext(function.Name);  
     
-    _memoryHandler.ResetContext(function.Name);  
+    _memoryHandler.ResetContext(function.Name);
 
+    var argscopy = new List<Symbol>(currentargs);
+    
     for (int i = 0; i < currentargs.Count; i++)
     {
         var originalParam = function.Parameters[i]; 
@@ -215,7 +228,20 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     
     datatransmiter.CodeBuilder.Append(Visit(function.CommandsContext).CodeBuilder);
 
-    _memoryHandler.CalledProcedures.Remove(function.Name);
+    _memoryHandler.CalledProcedures.Pop();
+    
+    for (int i = 0; i < argscopy.Count; i++)
+    {
+        var originalParam = function.Parameters[i]; 
+        var paramName = originalParam;
+
+        if (!originalParam.StartsWith("T "))
+        {
+            argscopy[i].isInitialized = _memoryHandler.GetCurrentContext()[paramName].isInitialized;
+        }
+
+    }
+
     _memoryHandler.ResetContext(function.Name);
     _memoryHandler.SetContext(currentcontext);
 
@@ -361,7 +387,9 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     
     public override VisitorDataTransmiter VisitRead(l4Parser.ReadContext ctx)
     {
+        isIninitialaizngCommand = true;
         var valueContext = Visit(ctx.identifier());
+        isIninitialaizngCommand = false;
         var dataTransmiter = new VisitorDataTransmiter();
         if (valueContext is null)
         {
@@ -465,35 +493,37 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     }
 
    public override VisitorDataTransmiter VisitAssign(l4Parser.AssignContext ctx)
-{
-    var identifierDataTransmitter = Visit(ctx.identifier());
-    var expressionDataTransmiter = Visit(ctx.expression());
-    var dataTransmiter = new VisitorDataTransmiter();
+   { 
+        isIninitialaizngCommand = true;
+        var identifierDataTransmitter = Visit(ctx.identifier());
+        isIninitialaizngCommand = false;
+        var expressionDataTransmiter = Visit(ctx.expression());
+        var dataTransmiter = new VisitorDataTransmiter();
 
-    if (identifierDataTransmitter != null && expressionDataTransmiter != null)
-    {
-        var variable = identifierDataTransmitter.Variable;
-
-       
-        if (_memoryHandler.GetSymbol(variable.Name).IsIterator())
+        if (identifierDataTransmitter != null && expressionDataTransmiter != null)
         {
-            _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name).Name}' wewnątrz pętli na linii {ctx.Start.Line}",ctx.Start.Line);
+            var variable = identifierDataTransmitter.Variable;
+
+           
+            if (_memoryHandler.GetSymbol(variable.Name).IsIterator())
+            {
+                _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name).Name}' wewnątrz pętli na linii {ctx.Start.Line}",ctx.Start.Line);
+            }
+
+           
+            dataTransmiter.CodeBuilder.Append(expressionDataTransmiter.CodeBuilder);
+            var offset = _codeGenerator.Assign(variable, expressionDataTransmiter.Variable, dataTransmiter.CodeBuilder);
+
+            dataTransmiter.Offset += offset;
+            return dataTransmiter;
         }
-
-       
-        dataTransmiter.CodeBuilder.Append(expressionDataTransmiter.CodeBuilder);
-        var offset = _codeGenerator.Assign(variable, expressionDataTransmiter.Variable, dataTransmiter.CodeBuilder);
-
-        dataTransmiter.Offset += offset;
-        return dataTransmiter;
-    }
-    else
-    {
+        else
+        {
+            
+            _memoryHandler.AddError($"Błąd: Brak identyfikatora lub wyrażenia dla przypisania na linii {ctx.Start.Line}.",ctx.Start.Line);
+        }
         
-        _memoryHandler.AddError($"Błąd: Brak identyfikatora lub wyrażenia dla przypisania na linii {ctx.Start.Line}.",ctx.Start.Line);
-    }
-    
-    return dataTransmiter;
+        return dataTransmiter;
 }
 
     public override VisitorDataTransmiter VisitIf(l4Parser.IfContext ctx)
@@ -794,11 +824,12 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         _memoryHandler.SetLocation(ctx.PIDENTIFIER().Symbol.Line, ctx.PIDENTIFIER().Symbol.Column);
         lastPID = ctx.PIDENTIFIER().GetText();
        
-        return new VisitorDataTransmiter(_memoryHandler.GetVariable(ctx.PIDENTIFIER().GetText()));
+        return new VisitorDataTransmiter(_memoryHandler.GetVariable(ctx.PIDENTIFIER().GetText(),isIninitialaizngCommand));
     }
 
     public override VisitorDataTransmiter VisitGetArrayByPid(l4Parser.GetArrayByPidContext ctx)
     {
+        
         var pidList = ctx.PIDENTIFIER();
         _memoryHandler.SetLocation(pidList[0].Symbol.Line,pidList[0].Symbol.Column);
         lastPID = pidList[1].GetText();

@@ -4,11 +4,13 @@ namespace Kompilator2024
     {
        
         public string Name { get; }
-        public List<string> Parameters { get; }
-        public List<string> Declaretions { get; set; }
+        public List<string> Parameters { get; } = new List<string>();
+
+        public List<string> Declaretions { get; set; } = new List<string>();
         public bool IsExecuted { get; private set; }
         public bool isValid;
         public bool isCalled;
+        public bool isUndeclared = false;
         public Dictionary<string, Symbol> ExecutionContext { get; private set; }
 
         public l4Parser.CommandsContext CommandsContext;
@@ -37,6 +39,8 @@ namespace Kompilator2024
             Name = "called";
             isValid = true;
         }
+        
+        
         public static Procedure InvalidCalledProcedure()
         {
             return new Procedure("called") {isValid = true, isCalled = true};
@@ -47,6 +51,11 @@ namespace Kompilator2024
         {
             return new Procedure("invalid"){isValid = true, isCalled = false};
         
+        }
+
+        public static Procedure InvalidUndeclared()
+        {
+            return new Procedure("undeclared") { isValid = true, isCalled = false, isUndeclared = true};
         }
         // public void AddLocalVariable(Variable variable)
         // {

@@ -7,9 +7,13 @@ namespace Kompilator2024
 
         private Dictionary<string, Procedure> Procedures = new Dictionary<string, Procedure>();
         private Dictionary<string, Symbol> _constantsDictionary = new Dictionary<string, Symbol>();
-        public HashSet<string> CalledProcedures = new HashSet<string>();
+        public Stack<string> CalledProcedures = new Stack<string>();
         private Stack<Dictionary<string, Symbol>> _contextStack = new Stack<Dictionary<string, Symbol>>();
         private Dictionary<string, Symbol> _currentContext = new Dictionary<string, Symbol>();
+        public List<string> _proceduresOrder = new List<string>();
+        public List<(string,int)> _proceduresDeclarationOrder = new List<(string,int)>();
+        public List<(string,int)> _proceduresCallOrder = new List<(string,int)>();
+        
         
         private List<string> _errors = new List<string>();
         private long _memoryEndPointer = 15;
@@ -19,6 +23,7 @@ namespace Kompilator2024
         private string ErrorTextColor = "\\u001B31;1m";
         private long currColumn;
         private long currLine;
+        public string currentContextName;
 
         public void AddError(string errorMessage,long line)
         {
@@ -142,15 +147,25 @@ namespace Kompilator2024
             currLine = line;
         }
 
-        public Variable GetVariable(string name)
+        public Variable GetVariable(string name, bool isInitialazing = true)
         {
             if (_currentContext.TryGetValue(name, out var symbol))
             {
                 if (symbol.isArray)
                 {
-                    AddError($"Cannot use '{name}' as variable in line '{currLine}' : '{currColumn}", currLine);
+                    AddError($"Cannot use '{name}' as variable in line '{currLine}' : '{currColumn}'", currLine);
+                    return GetInvalidVariable();
                 }
 
+                if (!isInitialazing && !symbol.isInitialized)
+                {
+                    AddError($"Not initialized symbol '{name}' in '{currLine}' : '{currColumn}'",currLine );
+                    return GetInvalidVariable();
+                }
+                if (isInitialazing)
+                {
+                    symbol.isInitialized = true;
+                }
                 return new Variable(name, symbol.Offset);
             }
 
@@ -229,24 +244,24 @@ namespace Kompilator2024
 
         public Variable GetArrValNum(string name, long pos)
         {
-            Symbol sym = _currentContext[name];
 
-            if (sym == null)
+            if (!_currentContext.TryGetValue(name, out var sym))
             {
-                return null;
+                AddError($"Array  '{name}' does not exitst", currLine);
+                return GetInvalidVariable();
             }
 
             if (!sym.isArrayy())
             {
                 AddError(
                     $"Error '{name}' variable is not in array at line '{currLine}' : '{name}' is declared as casual in line '{currColumn}'",currLine);
-                return null;
+                return GetInvalidVariable();
             }
 
             if (sym.ArrayEndIdx < pos || sym.ArrayBeginIdx > pos)
             {
                 AddError($"Error '{name}' ['{pos}'] out of bounds at line '{currLine}' : '{currColumn}'",currLine);
-                return null;
+                return GetInvalidVariable();
             }
 
             Variable ret_pos = GetConstVariable(pos);
@@ -258,12 +273,17 @@ namespace Kompilator2024
 
         public Variable GetArrValVar(string name, string pos_var)
         {
-            Symbol sym = _currentContext[name];
-            Symbol pos = _currentContext[pos_var];
 
-            if (sym == null || pos == null)
+            if (!_currentContext.TryGetValue(name, out var sym))
             {
-                return null;
+                AddError($"This symbol '{name}' not exist", currLine);
+                return GetInvalidVariable();
+            }
+            
+            if (!_currentContext.TryGetValue(pos_var, out var pos))
+            {
+                AddError($"Array index symbol '{pos_var}' not exist", currLine);
+                return GetInvalidVariable();
             }
 
             if (!sym.isArrayy())
@@ -277,7 +297,7 @@ namespace Kompilator2024
                 return GetInvalidVariable();
             }
 
-            Variable posVar = GetVariable(pos.Name);
+            Variable posVar = GetVariable(pos.Name,false);
             Variable offsetVar = GetConstVariable(sym.ArrayBeginIdx);
             Variable adressVar = GetConstVariable(sym.GotOffset());
 
@@ -318,10 +338,24 @@ namespace Kompilator2024
             _memSymbolMap[funcName] = new Dictionary<string, Symbol>();
             
         }
+        
+        public void RegisterProcedure(string procName,int line)
+        {
+            if (!_proceduresDeclarationOrder.Contains((procName,line)))
+            {
+                _proceduresDeclarationOrder.Add((procName,line));
+            }
+        }
+        
+        public void RegisterProcedureCall(string procName, int lineNumber)
+        {
+            _proceduresCallOrder.Add((procName,lineNumber));
+        }
 
 
         public void AddFunction(Procedure procedure)
         {
+           
             Procedures[procedure.Name] = procedure;
         }
 
@@ -330,15 +364,15 @@ namespace Kompilator2024
 
             if (!CheckIfProcedureExists(name))
             {
-               // AddError($"Błąd: Próba wywołania niezadeklarowanej procedury '{name}'.");
                 return GetInvalidProcedure();
             }
 
-            
             if (CalledProcedures.Contains(name))
             {
                 return GetInvalidCalledProcedure();
             }
+
+            
             return Procedures[name];
         }
 
@@ -350,6 +384,7 @@ namespace Kompilator2024
             }
             
             _currentContext = _memSymbolMap[context];
+            
         }
 
         public void SetContext(Dictionary<string, Symbol> context)
@@ -365,6 +400,7 @@ namespace Kompilator2024
         public void SetSymbolOffset(string name, Symbol variable)
         {
             _currentContext[name].Offset = variable.Offset;
+            _currentContext[name].isInitialized = variable.isInitialized;
         }
 
         public void ResetContext(string name)
@@ -413,5 +449,34 @@ namespace Kompilator2024
 
             return Procedure.InvalidCalledProcedure();
         }
+
+        public Procedure GetInvalidUndeclaredProcedure()
+        {
+            if (CheckIfProcedureExists("undeclared"))
+            {
+                return GetFunction("undeclared");
+            }
+
+            return Procedure.InvalidUndeclared();
+        }
+        
+     
+       
+        
+        public void ValidateProcedureOrder()
+        {
+            int lastIndex = -1;
+            for (var i = 0; i < _proceduresCallOrder.Count; i++)
+            {
+                if (_proceduresCallOrder[i].Item2 < _proceduresDeclarationOrder.First(x => x.Item1.Equals(_proceduresCallOrder[i].Item1)).Item2)
+                {
+                    AddError($"Procedure '{_proceduresCallOrder[i].Item1}' is called before its declaration!", _proceduresCallOrder[i].Item2);
+                }
+                
+            }
+        }
+        
+       
+
     }
 }

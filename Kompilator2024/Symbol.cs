@@ -8,7 +8,7 @@ public class Symbol
     public List<string> Parameters;
     
     
-     private bool isInitialized;
+     public bool isInitialized;
      public  bool isArray;
      public  bool isIterator;
      private bool isProcedure;

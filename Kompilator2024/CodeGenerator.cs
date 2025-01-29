@@ -194,9 +194,18 @@ public class CodeGenerator
 
     public long Mul(Variable var1, Variable var2,StringBuilder sb)
     {
+        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+        sb.AppendLine("LOAD 10");
+        sb.AppendLine("STORE 1");
+        sb.AppendLine("STORE 2");
+        sb.AppendLine("STORE 3");
+        sb.AppendLine("STORE 4");
+        sb.AppendLine("STORE 5");
+        sb.AppendLine("STORE 6");
+        sb.AppendLine("STORE 7");
         // Mem
         // [0, 0, 0, 0, 0, 0] 
-        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+    
         GetVarVal(var1, 3, sb);
         GetVarVal(var2, 4, sb);
         // Inicjalizacja liczb
@@ -213,7 +222,7 @@ public class CodeGenerator
         // Inicjalizacja rejestru znaku (Memory[5])
         sb.AppendLine("STORE 5");
 
-
+        
 
         // [0, var1, var2, 0, 0, 0] 
         // Sprawdź znak pierwszej liczby (var1)
@@ -240,11 +249,11 @@ public class CodeGenerator
         sb.AppendLine("LOAD 10");
         sb.AppendLine("SUB 2");
         sb.AppendLine("STORE 2");
-
         sb.AppendLine("LOAD 5");
         sb.AppendLine("SUB 1"); // Zmieniamy znak na przeciwny
         sb.AppendLine("STORE 5");
 
+     
         // [sign, |var1|, |var2|, 0, 0, sign] 
 
         // Główna pętla
@@ -298,16 +307,26 @@ public class CodeGenerator
 
     public long Div(Variable var1, Variable var2, StringBuilder sb)
     {
+        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+        sb.AppendLine("LOAD 10");
+        sb.AppendLine("STORE 1");
+        sb.AppendLine("STORE 2");
+        sb.AppendLine("STORE 3");
+        sb.AppendLine("STORE 4");
+        sb.AppendLine("STORE 5");
+        sb.AppendLine("STORE 6");
+        sb.AppendLine("STORE 7");
+
         // Mem
         // [0, 0, 0, 0, 0, 0] 
         
         // Load first operand to memory
         //Imicjalizacja 0 i 1 w odpowienio Memory[10] i Memory [11]
         ;
-        long offset_start = sb.ToString().Trim().Split("\n", StringSplitOptions.RemoveEmptyEntries).LongLength;
+        
         GetVarVal(var1, 3, sb);
         GetVarVal(var2, 4, sb);
-
+        
         sb.AppendLine("LOAD 3"); // Załaduj var1
         sb.AppendLine("STORE 1"); // Przechowaj var1 w pamięci[1]
 
@@ -328,9 +347,9 @@ public class CodeGenerator
         // [0, var1, var2, 0, 0, 0] 
         // Sprawdź znak pierwszej liczby (var1)
         sb.AppendLine("LOAD 1");
-        sb.AppendLine("JZERO 78"); // Jeśli var1 == 0, zakończ (skocz do końca mnożenia)
+        sb.AppendLine("JZERO 82"); // Jeśli var1 == 0, zakończ (skocz do końca mnożenia)
         sb.AppendLine("LOAD 2");
-        sb.AppendLine("JZERO 76"); // Jeśli var2 == 0, zakończ (wynik = 0)
+        sb.AppendLine("JZERO 80"); // Jeśli var2 == 0, zakończ (wynik = 0)
 
         sb.AppendLine("LOAD 1");
         sb.AppendLine("JPOS 7"); // Jeśli var1 > 0, kontynuuj
@@ -427,11 +446,16 @@ public class CodeGenerator
         
         sb.AppendLine("LOAD 5"); // Załaduj rejestr znaku
 
-        sb.AppendLine("JZERO 5"); // Jeśli znak == 0 (dodatni), pomiń negację wyniku
-
+        sb.AppendLine("JZERO 9"); // Jeśli znak == 0 (dodatni), pomiń negację wyniku
+     
+        
         // Negacja wyniku, jeśli znak == 1 (ujemny)
-        sb.AppendLine("SET 0");
+        sb.AppendLine("LOAD 10");
         sb.AppendLine("SUB 3");
+        sb.AppendLine("STORE 3");
+        sb.AppendLine("LOAD 6");
+        sb.AppendLine("JZERO 4");
+        sb.AppendLine("LOAD 3");
         sb.AppendLine("SUB 11");
         sb.AppendLine("STORE 3");
         // Wynik w p0

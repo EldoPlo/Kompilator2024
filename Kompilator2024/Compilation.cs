@@ -57,12 +57,12 @@ namespace Kompilator2024
                     List<string> allerrors = new List<string>();
                     allerrors.AddRange(visitor.GetErrors());
                     allerrors.AddRange(memory.GetErrors());
-                    throw new Exception(string.Join("\n", allerrors));
+                    throw new ApplicationException(string.Join("\n", allerrors));
                 }
 
                 WriteCode(output, result);
             }
-            catch (Exception e)
+            catch (ApplicationException e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(e.Message);
