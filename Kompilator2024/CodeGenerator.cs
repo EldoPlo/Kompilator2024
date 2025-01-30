@@ -68,7 +68,7 @@ public class CodeGenerator
     public long GetArrVarToMem(Variable var, long memoryIndex, StringBuilder sb)
     {
         
-        // sb.AppendLine($"ADD {var.ArrayOffset}");
+        
         var offset = 0L;
         offset += LoadArrAddress(var, sb);
         sb.AppendLine($"LOADI 0");
@@ -125,7 +125,6 @@ public class CodeGenerator
         long offset = 0;
         if (var.IsArray)
         {
-            // Sprawdzamy, czy zmienna tablicowa jest prawidłowo ustawiona
             if (var.ArrayAddressVariable == null)
             {
                 throw new InvalidOperationException($"Array address variable for {var.Name} is not initialized.");

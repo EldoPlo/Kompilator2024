@@ -32,19 +32,6 @@ namespace Kompilator2024
             Errorfound = true;
             ErrorCounter++;
         }
-
-        // public void PrintErrors()
-        // {
-        //     if (_errors.Count > 0)
-        //     {
-        //         Console.ForegroundColor = ConsoleColor.Red;
-        //         foreach (var error in _errors)
-        //         {
-        //             Console.WriteLine(error);
-        //         }
-        //         Console.ResetColor();
-        //     }
-        // }
         public MemoryHandler()
         {
             InitConstantVariables();

@@ -43,15 +43,6 @@ public class Variable
         IsArray = true;
         Name = name;
     }
-    
-    // public Variable(long address, long arrayAddress, long arrOffset)
-    // {
-    //     Address = address;
-    //     ArrayAddress = arrayAddress;
-    //     ArrayOffset = arrOffset;
-    //     IsSet = true;
-    //     IsArray = true;
-    // }
 
     public Variable( long offset, long arrayBeginIdx, long arrayEndIdx, String name= "")
     {
@@ -72,7 +63,7 @@ public class Variable
         IsSet = true;
     }
 
-    // Const constructor
+    
     public Variable(string name, long address, long value)
     {
         Name = name;

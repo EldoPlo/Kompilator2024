@@ -21,18 +21,5 @@ public class VisitorDataTransmiter
     {
         Procedure = procedure;
     }
-   
-    public void SetVariable(Variable variable) => Variable = variable;
-
-   
-    public void SetCodeBuilder(StringBuilder codeBuilder)
-    {
-        CodeBuilder = codeBuilder;
-    }
-
     
-    public string GetGeneratedCode()
-    {
-        return CodeBuilder.ToString();
-    }
 }

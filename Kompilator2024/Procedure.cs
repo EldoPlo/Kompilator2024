@@ -26,21 +26,12 @@ namespace Kompilator2024
             isCalled = false;
 
         }
-
         public Procedure(string name)
         {
             Name = "invalid";
             isValid = true;
             isCalled = false;
         }
-
-        public Procedure(string name, bool init = true)
-        {
-            Name = "called";
-            isValid = true;
-        }
-        
-        
         public static Procedure InvalidCalledProcedure()
         {
             return new Procedure("called") {isValid = true, isCalled = true};
@@ -57,36 +48,7 @@ namespace Kompilator2024
         {
             return new Procedure("undeclared") { isValid = true, isCalled = false, isUndeclared = true};
         }
-        // public void AddLocalVariable(Variable variable)
-        // {
-        //     if (LocalVariables.Exists(v => v.Name == variable.Name))
-        //     {
-        //         throw new InvalidOperationException($"Variable '{variable.Name}' already exists in procedure '{Name}'.");
-        //     }
-        //
-        //     LocalVariables.Add(variable);
-        // }
-
-        public void MarkAsExecuted(Dictionary<string, Symbol> context)
-        {
-            IsExecuted = true;
-            ExecutionContext = context;
-        }
-
-        public bool ISValid()
-        {
-            return isValid;
-        }
-        //
-        // public List<string> GetParameterNames()
-        // {
-        //     return Parameters.Select(p => p.Name).ToList();
-        // }
-        //
-        // public bool HasLocalVariable(string name)
-        // {
-        //     return LocalVariables.Any(v => v.Name == name);
-        // }
-
+      
+        
     }
 }

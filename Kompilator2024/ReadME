@@ -1,0 +1,10 @@
+#AUTHOR : RAFAŁ CHOJNACKI 272386  
+#INTRUKCJA URUCHAMIANIA KOMPILATORA
+
+1. Trzeba mieć pobraną bibliotekę ANTLR4 dla C#
+2. Trzeba mieć pobraną wersję dotnet9 (dokładnie mam wersje 9.0.0)
+3. Kompilator jest przesłany w folderze Kompilator/Kompilator2024/Kompilator2024/(tutaj projekt i wszystkie klasy)
+4. Trzeba być w folderze Kompilator2024/Kompilator2024 (przykladowo musimy być w Users/Rafał/Kompilator/Kompilator2024/Kompilator2024)
+5. uruchamiamy komendę dotnet build --configuration Debug
+6. Po uruchomieniu tej komendy uruchamiamy /bin/Debug/net9.0/Kompilator.exe <plik wejściowy (u mnie to jest test1.imp)> <plik wyjściowy (u mnie to stworzony plik test1.mr)>
+7. Po uruchomieniu tego w test1.mr utworzy nam się kod z instrukcjami assemblerowskimi, który następnie możemy przetestować na maszynie wirtualnej 

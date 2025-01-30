@@ -173,7 +173,8 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
    
     if (currentargs.Count != function.Parameters.Count)
     {
-        AddError("TRARlala in ");
+        AddError($"Error : Diffrent quantity of arguments and parameters in function '{function.Name}' in line '{ctx.Start.Line}' ");
+        return datatransmiter;
     }
 
     var currentcontext = _memoryHandler.GetCurrentContext();  
@@ -374,7 +375,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
 
         if (valueContext is null)
         {
-            Console.WriteLine("Wartość w WRITE nie jest poprawna.");
+            AddError($"Error in line '{ctx.Start.Line}': Value in command Write is not correct.");
             return dataTransmiter;
         }
 
@@ -393,7 +394,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         var dataTransmiter = new VisitorDataTransmiter();
         if (valueContext is null)
         {
-            Console.WriteLine("Wartość w Read nie jest poprawna.");
+            AddError($"Error in line '{ctx.Start.Line}': Value in command READ is not correct.");
             return dataTransmiter;
         }
         var variable = valueContext.Variable;
@@ -437,26 +438,15 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         var leftvalue = Visit(ctx.left);  
         var rightvalue = Visit(ctx.right); 
         var dataTransmitter = new VisitorDataTransmiter(new Variable(0));
-        
-        
+
         dataTransmitter.CodeBuilder.Append(leftvalue.CodeBuilder);
         dataTransmitter.CodeBuilder.Append(rightvalue.CodeBuilder);
-
         
         var variable1 = leftvalue.Variable;
         var variable2 = rightvalue.Variable;
-        
-        
-     
 
-        
-
-        
         _codeGenerator.Mul(variable1, variable2, dataTransmitter.CodeBuilder);
 
-
-        
-        
         return dataTransmitter;
     }
 
@@ -507,7 +497,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
            
             if (_memoryHandler.GetSymbol(variable.Name).IsIterator())
             {
-                _memoryHandler.AddError($"ERROR : Próba przypisania iteratora '{_memoryHandler.GetSymbol(variable.Name).Name}' wewnątrz pętli na linii {ctx.Start.Line}",ctx.Start.Line);
+                _memoryHandler.AddError($"Iterator assignment attempt '{_memoryHandler.GetSymbol(variable.Name).Name}' inside loop body",ctx.Start.Line);
             }
 
            
@@ -520,7 +510,7 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
         else
         {
             
-            _memoryHandler.AddError($"Błąd: Brak identyfikatora lub wyrażenia dla przypisania na linii {ctx.Start.Line}.",ctx.Start.Line);
+            _memoryHandler.AddError($"Identificator or expression error.",ctx.Start.Line);
         }
         
         return dataTransmiter;
@@ -862,7 +852,6 @@ public override VisitorDataTransmiter VisitProc_call(l4Parser.Proc_callContext c
     }
     private string RemoveTablePrefix(string name)
     {
-        // Jeśli nazwa zaczyna się od "T ", zwróć samą nazwę bez prefiksu
         return name.StartsWith("T ") ? name.Substring(2) : name;
     }
     public List<string> GetErrors()

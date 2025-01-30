@@ -7,7 +7,7 @@ class Compiler
     {
         if (args.Length != 2)
         {
-            Console.WriteLine("Użycie: kompilator <nazwa pliku wejściowego> <nazwa pliku wyjściowego>");
+            Console.WriteLine("Use: compiler <nazwa pliku wejściowego> <nazwa pliku wyjściowego>");
             return;
         }
 
@@ -19,17 +19,17 @@ class Compiler
             
             if (!File.Exists(inputFileName))
             {
-                Console.WriteLine($"Błąd: Plik wejściowy \"{inputFileName}\" nie istnieje.");
+                Console.WriteLine($"Error: File input \"{inputFileName}\" doesn't exist.");
                 return;
             }
 
            
             string inputContent = File.ReadAllText(inputFileName);
-            Console.WriteLine($"Wczytano zawartość pliku wejściowego:\n{inputContent}");
+            Console.WriteLine($"Loaded content of the file input:\n{inputContent}");
 
             
             var compiler = new Kompilator2024.Compilation();
-            Console.WriteLine("Rozpoczynanie obliczeń...");
+            Console.WriteLine("Start Processing...");
 
             
             compiler.Calculate(inputContent, outputFileName);
@@ -37,16 +37,14 @@ class Compiler
             {
                 return;
             }
-            Console.WriteLine("Obliczenia zakończone pomyślnie.");
 
-           
-            Console.WriteLine($"Przetwarzanie zakończone. Wynik zapisano w pliku \"{outputFileName}\".");
+            Console.WriteLine($"Processing ended. Result saved in file :  \"{outputFileName}\".");
         }
         catch (Exception ex)
         {
             
-            Console.WriteLine($"Błąd: {ex.Message}");
-            Console.WriteLine($"Szczegóły błędu: {ex.StackTrace}");
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Error Details: {ex.StackTrace}");
         }
     }
 }

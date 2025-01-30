@@ -11,12 +11,9 @@ namespace Kompilator2024
             string msg, RecognitionException e)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-          
-            // Print the error message
-            Console.WriteLine($"Syntax error at line lalala {line}:{charPositionInLine} - {msg}");
-
-            // Reset the text color
-            Console.ResetColor();        }
+            Console.WriteLine($"Syntax error at line {line}:{charPositionInLine} - {msg}");
+            Console.ResetColor();        
+        }
     }
     public class Compilation
     {
@@ -40,9 +37,6 @@ namespace Kompilator2024
             {
                 throw new Exception("PROBLEM W KOMPILACJI");
             }
-
-           
-          
             try
             {
                 var result = visitor.Visit(tree);
@@ -55,8 +49,11 @@ namespace Kompilator2024
                 {
                     isValid = true;
                     List<string> allerrors = new List<string>();
+                   
                     allerrors.AddRange(visitor.GetErrors());
                     allerrors.AddRange(memory.GetErrors());
+                    allerrors.Add("\n");
+                    allerrors.Add("\u001B[31mCOMPILATION ERROR\u001B[0m");
                     throw new ApplicationException(string.Join("\n", allerrors));
                 }
 
@@ -73,7 +70,6 @@ namespace Kompilator2024
 
         private void WriteCode(string path, VisitorDataTransmiter result)
         {
-            Console.WriteLine($"Zawartość CodeBuilder przed zapisaniem: {result.CodeBuilder.ToString()}");
             if (result.CodeBuilder.Length == 0)
             {
                 Console.WriteLine("Błąd: CodeBuilder jest pusty.");

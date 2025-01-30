@@ -64,8 +64,7 @@ public class Symbol
         ArrayBeginIdx = 0;
         ArrayEndIdx = 0;
     }
-    
-    // Konstruktor dla procedur
+
     public Symbol(string name, long offset, List<string> parameters)
     {
         Name = name;
